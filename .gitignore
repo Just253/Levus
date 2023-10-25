@@ -1,0 +1,4 @@
+# eliminar cualquier carpeta que se llame __pycache__
+.vscode/
+__pycache__/
+oldFiles/
