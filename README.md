@@ -25,6 +25,6 @@ pip install requirements.txt
 > - (22/10/23) Traducir [Annyang] (https://github.com/TalAter/annyang) a python e implementarlo
 > - (23/10/23) Mejorar el class Annyang ahora llamado AnnyangV2 e integrado correctamente
 > - (24/10/23) Crear eventCommandHandler que administra los cambios en la carpeta comandos para actualizar la lista de comandos si es necesario.
-> - ~~(25/10/23) Traducir los bots de [ChatAll](https://github.com/xtekky/gpt4free) a python e implementarlo~~
+> - ~~(25/10/23) Traducir los bots de [ChatAll](https://github.com/sunner/ChatALL/) a python e implementarlo~~
 > - (28/10/23) Implementar [GTP4free](https://github.com/xtekky/gpt4free) y en paralelo buscar proyectos de reconocimiento de gestos para implementarlo en los siguientes dias.
 > - (29/10/23) Preparar el class Levus para unir la IA con AnnyangV2 (Reconocimiento de voz)
