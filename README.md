@@ -22,7 +22,7 @@ pip install requirements.txt
 ## Registro de cambios
 - Versión 0.0: Creación del repo y planificacion
 
-> - (22/10/23) Traducir [Annyang] (https://github.com/TalAter/annyang) a python e implementarlo
+> - (22/10/23) Traducir [Annyang](https://github.com/TalAter/annyang) a python e implementarlo
 > - (23/10/23) Mejorar el class Annyang ahora llamado AnnyangV2 e integrado correctamente
 > - (24/10/23) Crear eventCommandHandler que administra los cambios en la carpeta comandos para actualizar la lista de comandos si es necesario.
 > - ~~(25/10/23) Traducir los bots de [ChatAll](https://github.com/sunner/ChatALL/) a python e implementarlo~~
