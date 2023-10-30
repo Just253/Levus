@@ -24,4 +24,12 @@ if __name__ == "__main__":
       loop = asyncio.get_running_loop()
    except RuntimeError:
       loop = asyncio.get_event_loop()
-   loop.run_until_complete(test_ask())
+   #loop.run_until_complete(test_ask())
+   while True:
+      prompt = input(">> ")
+      loop.run_until_complete(test_ask(prompt))
+
+class Edge():
+  def __init__(self):
+    pass
+  
