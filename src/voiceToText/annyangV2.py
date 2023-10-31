@@ -62,7 +62,7 @@ class Annyang:
                 text = text[text.index(botName) + len(botName):]
                 
                 command = self.BOT.check_commands(text)
-                print(command)
+                #print(command)
                 if command == False:
                     await self.BOT.askIA(text)
             except sr.UnknownValueError:

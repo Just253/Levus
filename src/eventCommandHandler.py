@@ -62,11 +62,8 @@ class CommandHandler(Handler):
   def _fileNameToModule(self,filePath):
       module_name = filePath[:-3]
       module_path = os.path.join(self.comando_dir, filePath)
-      print(module_path)
       spec = importlib.util.spec_from_file_location(module_name, module_path)
-      print(spec)
       module = importlib.util.module_from_spec(spec)
-      print(module)
       spec.loader.exec_module(module)
       module.Command.filePath = filePath
       return module
@@ -83,7 +80,6 @@ class CommandHandler(Handler):
       filePath = self._isValidFile(filePath)
       if not filePath: return
       module = self._fileNameToModule(filePath)
-      print(module)
       commandName = module.Command.getCommandName(module.Command)
       self.BOT.add_commands({commandName: module.Command})
     except Exception as e:
