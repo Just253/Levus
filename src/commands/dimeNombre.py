@@ -1,4 +1,4 @@
-from command import Botcommand
+from src.command import Botcommand
 class Command(Botcommand):
   name = 'dime tu nombre'
   description = 'Muestra el nombre de bot'

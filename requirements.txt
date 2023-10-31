@@ -1,5 +1,6 @@
+g4f==0.1.7.9
+re_edge_gpt==0.0.14
 selenium==4.14.0
 SpeechRecognition==3.8.1
 watchdog==3.0.0
-gf4==0.1.7.7
-browser_cookie3==0.19.1
+webdriver_manager==4.0.1

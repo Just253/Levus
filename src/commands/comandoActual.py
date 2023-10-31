@@ -1,5 +1,4 @@
-from command import Botcommand
-from annyangV2 import Annyang
+from src.command import Botcommand
 class Command(Botcommand):
   name='dime todos los comandos'
   description='Muestra todos los comandos'

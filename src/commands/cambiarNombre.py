@@ -1,8 +1,9 @@
-from command import Botcommand
+from src.command import Botcommand
 
 class Command(Botcommand):
   name = 'cambiar nombre'
-  description = 'Cambia el nombre del bot|'
+  description = 'Cambia el nombre del bot'
+  needArgument = True
   def execute(self, *args):
     if args[0] is None:
       return print('Especifica un nombre')

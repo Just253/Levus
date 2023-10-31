@@ -1,7 +1,8 @@
-from annyangV2 import Annyang
+from src.Levus import Levus
 class Botcommand:
-  BOT: Annyang
-  def __init__(self,BOT):
+  BOT: Levus
+  needArgument = False
+  def __init__(self,BOT: Levus):
     self.description = ''
     self.BOT = BOT
 
