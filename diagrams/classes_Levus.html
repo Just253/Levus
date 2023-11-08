@@ -1,0 +1,247 @@
+<html>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+      <div class="mermaid">
+    
+        classDiagram
+          class Bing {
+            supports_gpt_4 : bool
+            supports_message_history : bool
+            url : str
+            working : bool
+            create_async_generator(model: str, messages: Messages, proxy: str, cookies: dict, tone: str, image: str) AsyncResult
+          }
+          class AsyncGeneratorProvider {
+            supports_stream : bool
+            create_async(model: str, messages: Messages) str
+            create_async_generator(model: str, messages: Messages)* AsyncResult
+            create_completion(model: str, messages: Messages, stream: bool) CreateResult
+          }
+          class AsyncProvider {
+            create_async(model: str, messages: Messages)* str
+            create_completion(model: str, messages: Messages, stream: bool) CreateResult
+          }
+          class BaseProvider {
+            needs_auth : bool
+            params
+            supports_gpt_35_turbo : bool
+            supports_gpt_4 : bool
+            supports_message_history : bool
+            supports_stream : bool
+            url : str
+            working : bool
+            create_async(model: str, messages: Messages) str
+            create_completion(model: str, messages: Messages, stream: bool)* CreateResult
+          }
+          class PyAudio {
+            close(stream)
+            get_default_host_api_info()
+            get_default_input_device_info()
+            get_default_output_device_info()
+            get_device_count()
+            get_device_info_by_host_api_device_index(host_api_index, host_api_device_index)
+            get_device_info_by_index(device_index)
+            get_format_from_width(width, unsigned)
+            get_host_api_count()
+            get_host_api_info_by_index(host_api_index)
+            get_host_api_info_by_type(host_api_type)
+            get_sample_size(format)
+            is_format_supported(rate, input_device, input_channels, input_format, output_device, output_channels, output_format)
+            open()
+            terminate()
+          }
+          class AudioSource {
+          }
+          class Microphone {
+            CHUNK : int
+            SAMPLE_RATE : NoneType, int
+            SAMPLE_WIDTH
+            audio : NoneType
+            device_index : NoneType
+            format
+            pyaudio_module
+            stream : NoneType
+            get_pyaudio()
+            list_microphone_names()
+          }
+          class MicrophoneStream {
+            pyaudio_stream
+            close()
+            read(size)
+          }
+          class Recognizer {
+            bing_cached_access_token
+            bing_cached_access_token_expiry
+            dynamic_energy_adjustment_damping : float
+            dynamic_energy_ratio : float
+            dynamic_energy_threshold : bool
+            energy_threshold : int
+            non_speaking_duration : float
+            on_end : NoneType
+            on_error : NoneType
+            on_result : NoneType
+            on_start : NoneType
+            operation_timeout : NoneType
+            pause_threshold : float
+            phrase_threshold : float
+            adjust_for_ambient_noise(source, duration)
+            listen(source, timeout, phrase_time_limit, snowboy_configuration)
+            listen_in_background(source, callback, phrase_time_limit)
+            recognize_bing(audio_data, key, language, show_all)
+            recognize_google(audio_data, key, language, show_all)
+            recognize_google_cloud(audio_data, credentials_json, language, preferred_phrases, show_all)
+            recognize_houndify(audio_data, client_id, client_key, show_all)
+            recognize_ibm(audio_data, username, password, language, show_all)
+            recognize_sphinx(audio_data, language, keyword_entries, grammar, show_all)
+            recognize_wit(audio_data, key, show_all)
+            record(source, duration, offset)
+            snowboy_wait_for_hot_word(snowboy_location, snowboy_hot_word_files, source, timeout)
+          }
+          class Levus {
+            IA
+            annyang
+            bot_name : str
+            command_handler
+            commands : list
+            debug : bool
+            observer
+            add_commands(commands)
+            askIA(text)
+            check_commands(text)
+            cleanText(command, text)*
+            getBotName()*
+            get_bot_name()
+            remove_commands(commands)
+            set_bot_name(name)
+            start()
+            startImageRecognition()*
+            startVoiceRecognition()*
+            stopAll()*
+            stopImageRecognition()*
+            stopVoiceRecognition()*
+          }
+          class Botia {
+            ask(text, temperature)
+            askInternet(text, temperature)
+            askProgramming(text)
+            newCommand(text)
+          }
+          class Botcommand {
+            BOT
+            description : str
+            name : str
+            needArgument : bool
+            execute()*
+            getCommandDescription()
+            getCommandName()
+            help()
+          }
+          class CommandHandler {
+            BOT : NoneType
+            comando_dir
+          }
+          class Handler {
+            on_created(event)
+            on_deleted(event)
+            on_modified(event)
+            on_moved(event)
+          }
+          class Annyang {
+            BOT : NoneType
+            abort()
+            add_callback(event, callback, context)
+            pause()
+            remove_callback(event, callback)
+            resume()
+            set_language(language)
+            start(options)
+          }
+          class FileSystemEventHandler {
+            dispatch(event)
+            on_any_event(event)*
+            on_closed(event)*
+            on_created(event)*
+            on_deleted(event)*
+            on_modified(event)*
+            on_moved(event)*
+            on_opened(event)*
+          }
+          class BaseObserver {
+            emitters
+            add_handler_for_watch(event_handler, watch)
+            dispatch_events(event_queue)
+            on_thread_stop()
+            remove_handler_for_watch(event_handler, watch)
+            schedule(event_handler, path, recursive)
+            start()
+            unschedule(watch)
+            unschedule_all()
+          }
+          class EventDispatcher {
+            event_queue
+            timeout
+            dispatch_events(event_queue)*
+            run()
+            stop()
+          }
+          class EventQueue {
+          }
+          class FSEventsObserver {
+            schedule(event_handler, path, recursive)
+          }
+          class InotifyObserver {
+          }
+          class KqueueObserver {
+          }
+          class PollingObserver {
+          }
+          class WindowsApiObserver {
+          }
+          class BaseThread {
+            daemon : bool
+            stopped_event
+            on_thread_start()*
+            on_thread_stop()*
+            should_keep_running()
+            start()
+            stop()
+          }
+          class SkipRepeatsQueue {
+            unfinished_tasks
+          }
+          Bing --|> AsyncGeneratorProvider
+          AsyncGeneratorProvider --|> AsyncProvider
+          AsyncProvider --|> BaseProvider
+          Microphone --|> AudioSource
+          Recognizer --|> AudioSource
+          CommandHandler --|> Handler
+          Handler --|> FileSystemEventHandler
+          BaseObserver --|> EventDispatcher
+          EventDispatcher --|> BaseThread
+          EventQueue --|> SkipRepeatsQueue
+          FSEventsObserver --|> BaseObserver
+          InotifyObserver --|> BaseObserver
+          KqueueObserver --|> BaseObserver
+          PollingObserver --|> BaseObserver
+          WindowsApiObserver --|> BaseObserver
+          Bing --* Botia : _IA_programming
+          Bing --* Botia : _IA_chat
+          Bing --* Botia : _IA_internet
+          PyAudio --* Microphone : audio
+          Microphone --* Annyang : _microphone
+          MicrophoneStream --* Microphone : stream
+          Recognizer --* Annyang : _recognizer
+          Levus --* Botcommand : BOT
+          Botia --* Levus : IA
+          CommandHandler --* Levus : command_handler
+          Annyang --* Levus : annyang
+          EventQueue --* EventDispatcher : _event_queue
+          FSEventsObserver --* Levus : observer
+          InotifyObserver --* Levus : observer
+          KqueueObserver --* Levus : observer
+          PollingObserver --* Levus : observer
+          WindowsApiObserver --* Levus : observer
+  
+       </div>
+  </body>
+</html>

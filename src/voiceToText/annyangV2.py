@@ -7,6 +7,7 @@
 # Mi codigo pero pasado a python
 
 import speech_recognition as sr
+import threading
 
 class Annyang:
     _bot_name = "avestruz"
@@ -27,7 +28,7 @@ class Annyang:
         self._recognizer.phrase_threshold = 0.3
         self._recognizer.non_speaking_duration = 0.5
 
-    async def start(self, options=None):
+    def start(self, options=None):
         if not options:
             options = {}
 
@@ -39,12 +40,15 @@ class Annyang:
         self._recognizer.energy_threshold = 4000
 
         self._is_listening = True
+
+        with self._microphone as source:
+            self._recognizer.adjust_for_ambient_noise(source)
+
         while self._is_listening:
             if self._is_paused:
                 continue
 
             with self._microphone as source:
-                self._recognizer.adjust_for_ambient_noise(source)
                 audio = self._recognizer.listen(source)
 
             try:
@@ -61,10 +65,8 @@ class Annyang:
                 # Cortar desde que menciona su nombre 
                 text = text[text.index(botName) + len(botName):]
                 
-                command = self.BOT.check_commands(text)
-                #print(command)
-                if command == False:
-                    await self.BOT.askIA(text)
+                command_thread = threading.Thread(target=self.BOT.check_commands, args=(text,))
+                command_thread.start()
             except sr.UnknownValueError:
                 if self._debug:
                     print('Speech not recognized')
