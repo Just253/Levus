@@ -1,8 +1,9 @@
-from command import Botcommand
+from src.command import Botcommand
 import os
 class Command(Botcommand):
   name = 'menciona'
   description = 'Dice el nombre de un comando'
+  needArgument = True
   def execute(self,*args):
     comando = args[0].strip()
     for command in self.BOT._commands:
