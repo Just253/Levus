@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QPoint, QPropertyAnimation, QRect, QEasingCurve
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PySide6.QtGui import QPainter, QPainterPath, QPalette, QBrush, QImage
+from PySide6.QtGui import QPainter, QPainterPath, QPalette, QBrush, QImage, QCursor
 from screeninfo import get_monitors
 
 def get_screen_resolution():
@@ -13,7 +13,7 @@ class DraggableRoundWindow(QWidget):
         super(DraggableRoundWindow, self).__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setFixedSize(100, 100)  # Set the size of the window
+        self.setFixedSize(85, 85)  # Set the size of the window
         self.dragging = False
         self.offset = QPoint()
         self.screen_width = screen_width
@@ -57,17 +57,28 @@ class DraggableRoundWindow(QWidget):
             self.offset = event.pos()
 
     def mouseMoveEvent(self, event):
-        if self.dragging:
-            self.move(event.globalPos() - self.offset)
+        if self.dragging: return self.move(event.globalPos() - self.offset)
+        
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.dragging = False
-            y = event.globalPos().y()
-            if event.globalPos().x() >= self.screen_width / 2:
-                x = self.screen_width - self.width() / 2
+            half_screen_width = self.screen_width / 2
+            quarter_window_width = self.width() / 4
+            window_height = self.height()
+            y = event.globalPos().y() - self.offset.y()
+
+            # Para que la ventana no salga de la pantalla
+            if y >= self.screen_height - window_height:
+                y = self.screen_height - window_height
+            elif y <= window_height:
+                y = 0
+
+            # Para que la ventana se acomode a la izquierda o derecha
+            if event.globalPos().x() >= half_screen_width:
+                x = self.screen_width - quarter_window_width
             else:
-                x = self.width() / -2
+                x = quarter_window_width - self.width()
 
             self.animation = QPropertyAnimation(self, b"geometry")
             self.animation.setDuration(500)  # Duración de la animación en milisegundos
