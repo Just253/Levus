@@ -10,7 +10,6 @@ import speech_recognition as sr
 import threading
 
 class Annyang:
-    _bot_name = "avestruz"
     BOT = None 
     def __init__(self, BOT):
         self.BOT = BOT
@@ -75,6 +74,7 @@ class Annyang:
                     print(f'Error: {e}')
 
             if not self._is_listening:
+                print('Stopped listening')
                 break
 
         if self._auto_restart and self._continuous:

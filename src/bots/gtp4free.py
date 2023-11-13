@@ -4,7 +4,7 @@ from g4f.Provider import (GeekGpt, Bing, You)
 from typing import List, Union
 import os.path
 logging.basicConfig()
-logging.getLogger().setLevel(logging.DEBUG)
+#logging.getLogger().setLevel(logging.DEBUG)
 
 def get_python_command():
     """Devuelve el comando para ejecutar Python en este sistema."""
