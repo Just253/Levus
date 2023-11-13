@@ -1,8 +1,6 @@
 # TODO: FIX CHILD WIDGETS not showing out of the window
-
-from typing import Optional
 from PySide6.QtCore import Qt, QPoint, QPropertyAnimation, QRect, QEasingCurve
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtGui import QPainter, QPainterPath, QPalette, QBrush, QImage, QCursor
 from screeninfo import get_monitors
 import os, sys
