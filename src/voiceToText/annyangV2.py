@@ -12,7 +12,8 @@ import threading
 class Annyang:
     BOT = None 
     def __init__(self, BOT):
-        self.BOT = BOT
+        from src.Levus import Levus
+        self.BOT: Levus = BOT
         self._recognizer = sr.Recognizer()
         self._microphone = sr.Microphone()
         self._is_listening = False
@@ -64,7 +65,7 @@ class Annyang:
                 # Cortar desde que menciona su nombre 
                 text = text[text.index(botName) + len(botName):]
                 
-                command_thread = threading.Thread(target=self.BOT.check_commands, args=(text,))
+                command_thread = threading.Thread(target=self.BOT.check_voice_commands, args=(text,))
                 command_thread.start()
             except sr.UnknownValueError:
                 if self._debug:

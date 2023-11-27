@@ -1,4 +1,4 @@
-g4f==0.1.8.2
+g4f==0.1.8.7
 PyAutoGUI==0.9.53
 pylint==3.0.2
 PySide6==6.6.0
@@ -10,3 +10,4 @@ screeninfo==0.8.1
 SpeechRecognition==3.8.1
 watchdog==3.0.0
 pyAudio==0.2.11
+re_edge_gpt==0.0.17

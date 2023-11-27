@@ -26,7 +26,8 @@ class Handler(FileSystemEventHandler):
 class CommandHandler(Handler):
   BOT = None
   def __init__(self,BOT, comando_dir):
-    self.BOT = BOT
+    from src.Levus import Levus
+    self.BOT: Levus = BOT
     self.comando_dir = comando_dir
     self._addCommandsFromDirs(comando_dir)
       
@@ -79,9 +80,14 @@ class CommandHandler(Handler):
       if self.BOT._debug: print(f"[DEBUG - _add_command] {filePath}")
       filePath = self._isValidFile(filePath)
       if not filePath: return
+      from src.command import Botcommand
       module = self._fileNameToModule(filePath)
-      commandName = module.Command.getCommandName(module.Command)
-      self.BOT.add_commands({commandName: module.Command})
+      Command: Botcommand = module.Command 
+      commandName = Command.getCommandName(module.Command)
+      support_gestor = Command.support_gestor
+      support_voice = Command.support_voice
+      if not commandName: return
+      self.BOT.add_commands({commandName: Command}, support_gestor=support_gestor, support_voice=support_voice)
     except Exception as e:
       print(f"[ERROR - _add_command] {e}")
   

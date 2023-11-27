@@ -76,7 +76,7 @@ class DraggableRoundWindow(CustomWidget):
         self.moveSideWidgets()
 
     def setup_window(self):
-        self.setFixedSize(90, 90)  # Set the size of the window
+        self.setFixedSize(90, 90)  # TODO: RELATIVE
         self.dragging = False
         self.ismoving = False
         self.cursor_over = False
