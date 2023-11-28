@@ -3,6 +3,7 @@ import asyncio
 
 class Command(Botcommand):
   name = 'crea un comando'
+  alternatives = ['agregar comando', 'crear comando', 'agregar un comando', 'has un comando']
   description = 'Crea un nuevo comando'
   needArgument = True
 

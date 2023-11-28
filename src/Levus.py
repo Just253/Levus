@@ -101,19 +101,22 @@ class Levus():
     for phrase, callback in self._commands_voice:
         from src.command import Botcommand
         command: Botcommand = callback(self)
-        if phrase.lower() in text_lower or phrase.lower() in command.alternative:
+        if phrase.lower() in text_lower or any(alternative.lower() in text_lower for alternative in command.alternatives):
+            if phrase.lower() not in text_lower: 
+              phrase = [alternative for alternative in command.alternatives if alternative.lower() in text_lower][0]
+
             isCommand = True
             if self._debug: print(f'Command matched: {phrase}')
             text = text[text_lower.index(phrase.lower()) + len(phrase):]
             try:
                 if command.needArgument and text == '':
                   print('FALTA ARGUMENTO')  
-                  break
-                command.execute(text)
+                else:
+                  command.execute(text, phrase)
                 break
             except Exception as e:
                 if self._debug: print(f'Error executing {phrase}: {e}')
-    if isCommand == False:
+    if not isCommand:
       asyncio.run(self.askIA(text))
   def check_gesture_commands(self, finger_positions):
     for phrase, callback in self._commands_image:
