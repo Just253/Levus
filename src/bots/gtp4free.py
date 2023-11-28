@@ -38,29 +38,21 @@ async def verifica_instala_libreria(library_name):
         else:
             logging.error(f"Error installing {library_name}: {stderr.decode()}")
             return False
-    python_command = get_python_command()
-    try:
-        __import__(library_name)
-        logging.info(f"The library {library_name} is already installed.")
-        return True
-    except ImportError:
-        logging.info(f"The library {library_name} is not installed. Installing...")
-        process = await asyncio.create_subprocess_exec(
-            python_command, "-m", "pip", "install", library_name,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await process.communicate()
-        if process.returncode == 0:
-            logging.info(f"The library {library_name} has been installed successfully.")
-            return True
-        else:
-            logging.error(f"Error installing {library_name}: {stderr.decode()}")
-            return False
+
+def limpiar_texto(texto):
+    # Eliminar enlaces
+    texto = re.sub(r'http\S+|www.\S+', '', texto, flags=re.MULTILINE)
+    # Eliminar citas
+    texto = re.sub(r'\[\^\d+\^\]\[\d+\]', '', texto, flags=re.MULTILINE)
+    # Eliminar referencias de enlaces
+    texto = re.sub(r'\[\d+\]:', '', texto, flags=re.MULTILINE)
+    return texto
+
 class Botia():
   _IA_programming = Bing # Bing tiene GPT4 por que le da bien programar comandos cortos
   _IA_chat = Bing 
   _IA_internet = Bing
-  # _messages = []
+  _messages_internet = [{"role": "System", "content": "TU FUNCION ES RESUMIRLE NOTICIAS DEL INTERNET CUANDO TE LO PIDA, DEBES SER PRECISO Y DIRECTO, NO DIGAS MAS DE LO QUE EL USUARIO TE DIGA O SEA NECESARIO, NO ALARGUES LAS RESPUESTAS, NO TE DAN PUNTOS SI LO HACES. Eres una IA para ayudar a los usuarios en las tareas de resumir o explicar noticias del Internet. QUE TUS RESPUESTAS POR PREDETERMINADO SEAN MAXIMO 2 ORACIONES AH NO SER QUE EL USUARIO DIGA EXPLICITAMENTE QUE SE AUMENTE, TU USAS UNICAMENTE PYTHON "}]
 
   def __init__(self) -> None:
     pass
@@ -80,6 +72,7 @@ class Botia():
         ignored=["Phind", "NooAi", "You", "GptForLove", "ChatBase"],
         temperature=temperature
       )
+
       return response
     except Exception as e:
       logging.error(e)
@@ -94,8 +87,10 @@ class Botia():
     return await self._send_messages(Provider=self._IA_programming, text=text,model=model, **kwargs)
   
   async def askInternet(self,text,temperature=0.2, **kwargs):
-    return await self._send_messages(Provider=self._IA_internet, text=text, temperature=temperature, **kwargs)
-  
+    self._messages_internet.append({"role": "user", "content": text})
+    response = await self._send_messages(Provider=self._IA_internet, text=text, temperature=temperature, messages=self._messages_internet, **kwargs)
+    self._messages_internet.append({"role": "assistant", "content": response})
+    return limpiar_texto(response)
   async def newCommand(self, text, **kwargs):
     dirname = os.path.dirname(__file__)
     command_class_path = os.path.join(dirname, os.pardir, "command.py")
@@ -125,6 +120,7 @@ class Botia():
     script_content = re.sub(r'```python|```', '', response)
     name_match = re.search(r"name = '(.*)'", script_content)
     libraries_match = re.search(r"libraries: (.*)", script_content)
+
     if not name_match:
       return await self.newCommand(text)
     if libraries_match:

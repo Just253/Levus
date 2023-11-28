@@ -76,12 +76,13 @@ class DraggableRoundWindow(CustomWidget):
         self.moveSideWidgets()
 
     def setup_window(self):
-        self.setFixedSize(90, 90)  # TODO: RELATIVE
+        self.screen_width, self.screen_height = get_screen_resolution()
+        l = self.screen_height / 12
+        self.setFixedSize(l, l) 
         self.dragging = False
         self.ismoving = False
         self.cursor_over = False
         self.offset = QPoint()
-        self.screen_width, self.screen_height = get_screen_resolution()
         self.cords = Coordinates()
         self.cords.x, self.cords.y = [self.width() / 4 - self.width() , self.screen_height / 2]
         self.toogle_window_opacity()
@@ -90,7 +91,7 @@ class DraggableRoundWindow(CustomWidget):
         image_path = os.path.join(parent_dir, "assets", "levus_logo.png")
         self.setup_background_image(image_path)
 
-        mic_logo = os.path.join(parent_dir, "assets", "mic_logo.webp")
+        mic_logo = os.path.join(parent_dir, "assets", "mic_logo_off.png")
         cam_logo = os.path.join(parent_dir, "assets", "cam_logo.webp")
         self.mic_widget.setup_background_image(mic_logo)
         self.cam_widget.setup_background_image(cam_logo)
@@ -175,7 +176,14 @@ class DraggableRoundWindow(CustomWidget):
         else:
             self.setWindowOpacity(0.2)
 
+app = None
 def startGui(voiceRecognitionToggle, imageRecognitionToggle, stopAll):
+    global app
     app = QApplication(sys.argv)
     window = DraggableRoundWindow(voiceRecognitionToggle, imageRecognitionToggle, stopAll)
     sys.exit(app.exec())
+
+def stopGui():
+    print("stopGui")
+    global app
+    app = None

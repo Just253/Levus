@@ -24,8 +24,8 @@ class Annyang:
         self._debug = False
         self._bot_active = False
 
-        self._recognizer.pause_threshold = 0.5
-        self._recognizer.phrase_threshold = 0.3
+        self._recognizer.pause_threshold = 1.5
+        self._recognizer.phrase_threshold = 0.5
         self._recognizer.non_speaking_duration = 0.5
 
     def start(self, options=None):
@@ -50,7 +50,9 @@ class Annyang:
 
             with self._microphone as source:
                 audio = self._recognizer.listen(source)
-
+            if not self._is_listening:
+                print('Stopped listening')
+                break
             try:
                 
                 text = self._recognizer.recognize_google(audio, language=self._language)
@@ -73,10 +75,6 @@ class Annyang:
             except sr.RequestError as e:
                 if self._debug:
                     print(f'Error: {e}')
-
-            if not self._is_listening:
-                print('Stopped listening')
-                break
 
         if self._auto_restart and self._continuous:
             self.start(options)

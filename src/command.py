@@ -6,6 +6,7 @@ class Botcommand:
   support_voice = True
   estado = False
   name = ''
+  alternative = []
   description = ''
   running = False
   needWait = True

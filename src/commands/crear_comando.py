@@ -7,4 +7,6 @@ class Command(Botcommand):
   needArgument = True
 
   def execute(self, *args):
-    asyncio.create_task(self.BOT._IA.newCommand(args[0]))
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(self.BOT._IA.newCommand(args[0]))

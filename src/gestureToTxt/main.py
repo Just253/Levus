@@ -2,6 +2,8 @@ import time
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
+from mediapipe.python.solutions import hands
+from mediapipe.python.solutions.hands import Hands
 from screeninfo import get_monitors
 from threading import Thread
 from pynput.mouse import Controller
@@ -18,7 +20,7 @@ class HandGesture:
         self.mouse = Controller()
         self.state = ''
         self.finger_positions = []
-        self.hands = mp.solutions.hands.Hands(static_image_mode=False,
+        self.hands: Hands = mp.solutions.hands.Hands(static_image_mode=False,
                                               max_num_hands=1,
                                               min_tracking_confidence=0.5,
                                               min_detection_confidence=0.5)
@@ -38,11 +40,11 @@ class HandGesture:
         self.run = False
 
     def _run_recognition(self):
-        fps_limit = 1
-        frame_period = 1/ fps_limit
+        fps_limit_no_hand = 10
+        fps_limit_hand = 25
+        
         while self.run:
             start_time = time.time()
-            state = ''
             success, frame = self.cap.read()
             if not success:
                 break
@@ -50,6 +52,7 @@ class HandGesture:
             result = self.hands.process(frame)
             if result.multi_hand_landmarks:
                 for handLms in result.multi_hand_landmarks:
+                    fps_limit = fps_limit_hand
                     mp.solutions.drawing_utils.draw_landmarks(frame, handLms, mp.solutions.hands.HAND_CONNECTIONS)
 
                     finger_tips = {
@@ -70,10 +73,14 @@ class HandGesture:
                     self.setLastFingersPositions(finger_positions)
                     Thread(target=self.BOT.check_gesture_commands(finger_positions)).start()
             else:
-                time_elapsed = time.time() - start_time
-                if time_elapsed < frame_period:
-                    time.sleep(frame_period - time_elapsed)
+                self.setLastFingersPositions(dict())
+                fps_limit = fps_limit_no_hand
             
+            frame_period = 1 / fps_limit
+            time_elapsed = time.time() - start_time
+            if time_elapsed < frame_period:
+                time.sleep(frame_period - time_elapsed)
+
             cv.imshow('Camera', frame)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -99,11 +106,11 @@ class HandGesture:
         fingers_down = [finger for finger in all_fingers if finger not in fingers_up]
 
         # Comprobar si los dedos que deberían estar arriba están arriba
-        if not all(finger_positions[finger][1] < finger_positions['palm'][1] for finger in fingers_up):
+        if not all(finger_positions[finger][1] > finger_positions['palm'][1] for finger in fingers_up):
             return False
 
         # Comprobar si los dedos que deberían estar abajo están abajo
-        if not all(finger_positions[finger][1] > finger_positions['palm'][1] for finger in fingers_down):
+        if not all(finger_positions[finger][1] < finger_positions['palm'][1] for finger in fingers_down):
             return False
 
         return True
