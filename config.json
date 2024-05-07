@@ -1,0 +1,11 @@
+{
+  "jar" : {
+    "jarFilePath": "...",
+    "options": "-xmx500m",
+    "args": ""
+  },
+  "py": {
+    "pyFilePath": "./sever/main.py",
+    "args": ""
+  }
+}
