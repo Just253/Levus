@@ -6,6 +6,7 @@ module levus.gui {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.bootstrapfx.core;
+    requires atlantafx.base;
     //requires com.almasb.fxgl.all;
     
 
