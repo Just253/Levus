@@ -57,7 +57,12 @@ try:
         args.samplerate = int(device_info["default_samplerate"])
         
     if args.model is None:
-        model = Model(lang="en-us")
+        ###################
+        ### CAMBIAR MODELO PARA NO PONER ARGUMENTOS
+        ### ligero: vosk-model-small-es-0.15
+        ### normal: vosk-model-es-0.42
+        ###################
+        model = Model(model_name="vosk-model-es-0.42")
     else:
         model = Model(lang=args.model)
 
@@ -66,7 +71,7 @@ try:
     else:
         dump_fn = None
 
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
+    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 16000, device=args.device,
             dtype="int16", channels=1, callback=callback):
         print("#" * 80)
         print("Press Ctrl+C to stop the recording")
