@@ -8,11 +8,11 @@ while True:
       print("Say something!")
       audio = r.listen(source)
 
-  # recognize speech using Google Speech Recognition
+  # recognize speech using whisper
   try:
-      text = r.recognize_google(audio, language='es-PE')
-      print("You said: " + text)
+      print("Whisper thinks you said " + r.recognize_vosk(audio, language="es")) 
+      # Whisper thinks you said Please download the model from https://github.com/alphacep/vosk-api/blob/master/doc/models.md and unpack as 'model' in the current folder.
   except sr.UnknownValueError:
-      print("Google Speech Recognition could not understand audio")
+      print("Whisper could not understand audio")
   except sr.RequestError as e:
-      print("Could not request results from Google Speech Recognition service; {0}".format(e))
+      print(f"Could not request results from Whisper; {e}")
