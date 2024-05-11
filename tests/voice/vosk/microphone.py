@@ -59,10 +59,10 @@ try:
     if args.model is None:
         ###################
         ### CAMBIAR MODELO PARA NO PONER ARGUMENTOS
-        ### ligero: vosk-model-small-es-0.15
+        ### ligero: vosk-model-small-es-0.42
         ### normal: vosk-model-es-0.42
         ###################
-        model = Model(model_name="vosk-model-es-0.42")
+        model = Model(model_name="vosk-model-small-es-0.42")
     else:
         model = Model(lang=args.model)
 
@@ -83,7 +83,7 @@ try:
             if rec.AcceptWaveform(data):
                 print(rec.Result())
             else:
-                print(rec.PartialResult())
+                pass #print(rec.PartialResult())
             if dump_fn is not None:
                 dump_fn.write(data)
 
