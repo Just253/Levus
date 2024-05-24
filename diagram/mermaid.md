@@ -87,12 +87,8 @@ graph TD
     commands/__init__.py["__init__.py"]
     commands/command.py["command.py"]
     commands/command.pyDescripcion["Clase padre de los comandos"]
-    nameCommand/
-    nameCommand/__init__.py["__init__.py"]
-    nameCommand/command.py["BotCommand.py"]
-    nameCommand/command.pyDescripcion["Clase del comando nameCommand"]
-    nameCommand/config.json["config.json"]
-    nameCommand/config.jsonDescripcion["Configuración del \ncomando nameCommand \n(opcional)"]
+    exampleCommand.py["exampleCommand.py"]
+    exampleCommand.py.Descripcion["Cada archivo tendra un class BotCommand \nque hereda de Command"]
     
     Server --> app.py
     app.py --> app.pyDescripcion
@@ -104,15 +100,9 @@ graph TD
     
     commands/ --> commands/command.py
     commands/command.py --> commands/command.pyDescripcion
-    commands/ --> nameCommand/
-    
-    nameCommand/ --> nameCommand/__init__.py
+    commands/ --> exampleCommand.py
 
-    nameCommand/ --> nameCommand/command.py
-    nameCommand/command.py --> nameCommand/command.pyDescripcion
-
-    nameCommand/ --> nameCommand/config.json
-    nameCommand/config.json --> nameCommand/config.jsonDescripcion
+    exampleCommand.py --> exampleCommand.py.Descripcion
 
 
     api/ --> api/routes/
@@ -131,12 +121,25 @@ classDiagram
     class Command{
         +String Name
         +String Description
+        +String[] requeriments
         +String[] Keywords
         +execute()
         +getName()
         +getDescription()
+        +getKeywords()
+        +setName()
+        +setDescription()
+        +setKeywords()
+        +getRequeriments()
+        +setRequeriments()
+        +Bot() return object Levus
     }
     class BotCommand{
+        +String Name
+        +String Description
+        +String[] requeriments
+        +String[] Keywords
+
         +execute()
     }
     Command <|-- BotCommand
