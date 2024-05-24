@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint
 import os
 import importlib
 
@@ -11,7 +11,7 @@ for filename in os.listdir(routes_dir):
         module = importlib.import_module(f'api.routes.{filename[:-3]}')
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
-            if isinstance(attr, Flask):
+            if isinstance(attr, Blueprint):
                 app.register_blueprint(attr)
 
 if __name__ == '__main__':
