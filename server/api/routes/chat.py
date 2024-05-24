@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-#from api.functions import pass
+#from api.functions import interactions
 
 chat_bp = Blueprint('chat', __name__)
 
