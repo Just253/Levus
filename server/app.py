@@ -8,11 +8,14 @@ app = Flask(__name__)
 routes_dir = os.path.join(os.path.dirname(__file__), 'api', 'routes')
 for filename in os.listdir(routes_dir):
     if filename.endswith('.py') and filename != '__init__.py':
-        module = importlib.import_module(f'api.routes.{filename[:-3]}')
-        for attr_name in dir(module):
-            attr = getattr(module, attr_name)
-            if isinstance(attr, Blueprint):
-                app.register_blueprint(attr)
+        try:
+            module = importlib.import_module(f'api.routes.{filename[:-3]}')
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+                if isinstance(attr, Blueprint):
+                    app.register_blueprint(attr)
+        except Exception as e:
+            print(f"Error al importar el módulo {filename}: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True)
