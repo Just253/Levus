@@ -4,6 +4,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
+
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.scene.control.Label;
@@ -34,6 +37,13 @@ public class ChatController {
 
     @FXML
     private ScrollPane chatBox;
+
+    @FXML
+    private TextField inputTxt;
+
+    @FXML
+    private Button btnSendMessage;
+
     String config_file = "config.json";
 
     public void loadChat(JSONObject messages) {
@@ -88,6 +98,19 @@ public class ChatController {
         }
         chatBox.setVvalue(1.0);
     }
+
+    public void sendMessage() {
+        String text = inputTxt.getText();
+        if (text.isEmpty()) {
+            return;
+        }
+        JSONObject message = new JSONObject();
+        message.put("role", "user");
+        message.put("message", text);
+        addMessage(message);
+        inputTxt.clear();
+    }
+
 
     public void initialize() {
         loadChatFromFile(config_file);

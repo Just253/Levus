@@ -98,8 +98,22 @@
          </children></HBox>
       <HBox fx:id="micAndCamControlBox" alignment="CENTER" prefHeight="64.0" prefWidth="600.0" spacing="20.0" VBox.vgrow="NEVER">
          <children>
-            <ToggleButton fx:id="micButton" contentDisplay="CENTER" mnemonicParsing="false" text="mic" />
-            <ToggleButton fx:id="camButton" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="cam" />
+            <ToggleButton fx:id="micButton" contentDisplay="CENTER" mnemonicParsing="false" text="" HBox.hgrow="ALWAYS">
+               <graphic>
+                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                        <FontIcon fx:id="micOnIcon" iconLiteral="mdmz-mic" iconSize="30" tabSize="9" visible="${micButton.selected}" />
+                        <FontIcon fx:id="micOffIcon" iconLiteral="mdmz-mic_off" iconSize="30" visible="${!micButton.selected}" />
+                  </StackPane>
+               </graphic>
+            </ToggleButton>
+            <ToggleButton fx:id="camButton" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="">
+               <graphic>
+                  <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                        <FontIcon fx:id="camOnIcon" iconLiteral="mdmz-videocam" iconSize="30" tabSize="9" visible="${camButton.selected}" />
+                        <FontIcon fx:id="camOffIcon" iconLiteral="mdmz-videocam_off" iconSize="30" visible="${!camButton.selected}" />
+                  </StackPane>
+               </graphic>
+            </ToggleButton>
          </children></HBox>
    </children>
 </VBox>
