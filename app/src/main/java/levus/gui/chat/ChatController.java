@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
 
+import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import org.json.JSONArray;
@@ -41,8 +42,6 @@ public class ChatController {
     @FXML
     private TextField inputTxt;
 
-    @FXML
-    private Button btnSendMessage;
 
     String config_file = "config.json";
 
@@ -69,15 +68,22 @@ public class ChatController {
         String role = message.getString("role");
         String text = message.getString("message");
         Label label = new Label();
-        label.setMaxWidth(Double.MAX_VALUE);
-    
+        //label.setMinWidth(100);
+        label.setMaxWidth(chatHistory.getWidth() * 0.9);
+        label.setMaxHeight(Double.MAX_VALUE);
         label.setWrapText(true);
         //label.setStyle("-fx-background-color: #333333;");
         label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         label.setText(text);
-        
+
+        chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
+            label.setMaxWidth(newValue.doubleValue() * 0.9);
+        });
+
         HBox hBox = new HBox();
+        hBox.setMinWidth(100);
         hBox.setMaxWidth(Double.MAX_VALUE);
+
         hBox.getChildren().add(label);
         if (role.equals("user")) {
             label.getStyleClass().add("messages-user");
@@ -99,7 +105,8 @@ public class ChatController {
         chatBox.setVvalue(1.0);
     }
 
-    public void sendMessage() {
+    @FXML
+    public void sendMessage(ActionEvent event) {
         String text = inputTxt.getText();
         if (text.isEmpty()) {
             return;

@@ -79,8 +79,8 @@
                   </ScrollPane>
                   <HBox fx:id="userInputBox" alignment="CENTER" prefHeight="34.0" prefWidth="600.0" spacing="4.0" VBox.vgrow="NEVER">
                      <children>
-                        <TextField fx:id="inputTxt" alignment="BOTTOM_LEFT" prefHeight="10.0" prefWidth="548.0" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="btnSendMessage" mnemonicParsing="false" text="">
+                        <TextField fx:id="inputTxt" alignment="BOTTOM_LEFT" prefHeight="10.0" prefWidth="548.0" HBox.hgrow="ALWAYS" onAction="#sendMessage"/>
+                        <Button fx:id="btnSendMessage" mnemonicParsing="false" text="" onAction="#sendMessage">
                            <graphic>
                               <FontIcon iconLiteral="mdmz-send" />
                            </graphic>
