@@ -29,12 +29,12 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'levus.gui'
-    mainClass = 'levus.gui.HelloApplication'
+    mainClass = 'levus.gui.App'
 }
 
 javafx {
     version = '21.0.3'
-    modules = ['javafx.controls', 'javafx.fxml', 'javafx.media']
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.graphics']
 }
 
 dependencies {
@@ -51,9 +51,11 @@ dependencies {
         exclude(group: 'org.jetbrains.kotlin')
     }
     implementation('io.github.mkpaz:atlantafx-base:2.0.1')
+    implementation('org.json:json:20240303')
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
 }
 
 test {
