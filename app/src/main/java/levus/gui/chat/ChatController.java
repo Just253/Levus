@@ -70,10 +70,8 @@ public class ChatController {
         hBox.setMaxWidth(Double.MAX_VALUE);
         hBox.getChildren().add(label);
         if (role.equals("user")) {
-                label.setText("User: " + text);
             hBox.setAlignment(Pos.CENTER_RIGHT);
         } else {
-            //      label.setText("Assistant: " + text);
             hBox.setAlignment(Pos.CENTER_LEFT);
         }
 
