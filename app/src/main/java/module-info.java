@@ -12,6 +12,8 @@ module levus.gui {
     //requires com.almasb.fxgl.all;
     requires org.kordamp.ikonli.javafx;
 
+    requires java.net.http;
+
 
 
     opens levus.gui to javafx.fxml;

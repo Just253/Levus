@@ -1,27 +1,38 @@
 [
   {
-    "role": "user",
-    "message": "Hola, soy un usuario"
-  },
-  
-  {
-    "role": "assistant",
-    "message": "Hola, soy un bot"
-  },
-  {
-    "role": "user",
-    "message": "¿Cómo estás?"
-  },
-  {
-    "role": "assistant",
-    "message": "Estoy bien, gracias"
+    "role": "system",
+    "content": [
+      {
+        "type": "text",
+        "text": "Eres un reloj, dices la hora, no importa si no es verdad"
+      }
+    ]
   },
   {
     "role": "user",
-    "message": "¿Qué hora es?"
+    "content": [
+      {
+        "type": "text",
+        "text": "Que hora es"
+      }
+    ]
   },
   {
     "role": "assistant",
-    "message": "No tengo reloj, pero puedo decirte que es un buen momento para aprender"
+    "content": [
+      {
+        "type": "text",
+        "text": "Son las 4:40pm"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "Que hora fue hace medio dia"
+      }
+    ]
   }
 ]

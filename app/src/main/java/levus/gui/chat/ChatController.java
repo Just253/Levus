@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import levus.gui.chat.ApiController;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
@@ -42,7 +43,7 @@ public class ChatController {
     @FXML
     private TextField inputTxt;
 
-
+    private JSONArray messages;
     String config_file = "config.json";
 
     public void loadChat(JSONObject messages) {
@@ -58,6 +59,7 @@ public class ChatController {
             Path resourcePath = Paths.get(resourceUrl.toURI());
             String content = new String(Files.readAllBytes(resourcePath), "UTF-8");
             JSONArray messages = new JSONArray(content);
+            this.messages = messages;
             addMessages(messages);
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,35 +68,38 @@ public class ChatController {
 
     public void addMessage(JSONObject message) {
         String role = message.getString("role");
-        String text = message.getString("message");
-        Label label = new Label();
-        //label.setMinWidth(100);
-        label.setMaxWidth(chatHistory.getWidth() * 0.9);
-        label.setMaxHeight(Double.MAX_VALUE);
-        label.setWrapText(true);
-        //label.setStyle("-fx-background-color: #333333;");
-        label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
-        label.setText(text);
+        JSONArray content = message.getJSONArray("content");
+        for (int i = 0; i < content.length(); i++) {
+            JSONObject item = content.getJSONObject(i);
+            if (item.getString("type").equals("text")) {
+                String text = item.getString("text");
+                Label label = new Label();
+                label.setMaxWidth(chatHistory.getWidth() * 0.9);
+                label.setMaxHeight(Double.MAX_VALUE);
+                label.setWrapText(true);
+                label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+                label.setText(text);
 
-        chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
-            label.setMaxWidth(newValue.doubleValue() * 0.9);
-        });
+                chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
+                    label.setMaxWidth(newValue.doubleValue() * 0.9);
+                });
 
-        HBox hBox = new HBox();
-        hBox.setMinWidth(100);
-        hBox.setMaxWidth(Double.MAX_VALUE);
+                HBox hBox = new HBox();
+                hBox.setMinWidth(100);
+                hBox.setMaxWidth(Double.MAX_VALUE);
 
-        hBox.getChildren().add(label);
-        if (role.equals("user")) {
-            label.getStyleClass().add("messages-user");
-            hBox.setAlignment(Pos.CENTER_RIGHT);
-        } else {
-            label.getStyleClass().add("messages-assistant");
-            hBox.setAlignment(Pos.CENTER_LEFT);
+                hBox.getChildren().add(label);
+                if (role.equals("user")) {
+                    label.getStyleClass().add("messages-user");
+                    hBox.setAlignment(Pos.CENTER_RIGHT);
+                } else {
+                    label.getStyleClass().add("messages-assistant");
+                    hBox.setAlignment(Pos.CENTER_LEFT);
+                }
+
+                chatHistory.getChildren().add(hBox);
+            }
         }
-
-        chatHistory.getChildren().add(hBox);
-
     }
 
     public void addMessages(JSONArray messages) {
@@ -113,9 +118,22 @@ public class ChatController {
         }
         JSONObject message = new JSONObject();
         message.put("role", "user");
-        message.put("message", text);
+        message.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", text)));
+        messages.put(message);
         addMessage(message);
         inputTxt.clear();
+        askAssistant();
+    }
+
+    public void askAssistant() {
+        JSONObject response = new JSONObject();
+        response.put("role", "assistant");
+        ApiController api = new ApiController();
+        JSONObject messageResponse = api.sendMessage(messages);
+        response.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", messageResponse.getString("response"))));
+        //response.put("message", messageResponse.getString("response"));
+        messages.put(response);
+        addMessage(response);
     }
 
 
