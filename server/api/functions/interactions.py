@@ -9,10 +9,8 @@ def get_response_from_openai(messages, tools=None, tool_choice=None, model="gpt-
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            tools=tools,
-            tool_choice=tool_choice,
         )
-        return response.choices[0].message['content']
+        return response.choices[0].message.content
     except Exception as e:
         print("Unable to generate ChatCompletion response")
         print(f"Exception: {e}")

@@ -40,6 +40,7 @@ messages=[
     }
   ]
 
-chat_url = "http://localhost:5000/api/chat"
+chat_url = "http://localhost:5000/chat"
 response = requests.post(chat_url, json={"model": model, "messages": messages})
+print(response.status_code)
 print(response.json())
