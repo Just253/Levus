@@ -10,8 +10,8 @@ module levus.gui {
     requires org.kordamp.bootstrapfx.core;
     requires atlantafx.base;
     //requires com.almasb.fxgl.all;
-    
-    
+    requires org.kordamp.ikonli.javafx;
+
 
 
     opens levus.gui to javafx.fxml;

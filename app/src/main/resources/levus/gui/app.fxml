@@ -36,6 +36,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox fx:id="MainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="levus.gui.chat.ChatController">
    <children>
@@ -61,10 +62,14 @@
                         </VBox>
                      </content>
                   </ScrollPane>
-                  <HBox fx:id="userInputTxt" alignment="CENTER" prefHeight="34.0" prefWidth="600.0" spacing="4.0" VBox.vgrow="NEVER">
+                  <HBox fx:id="userInputBox" alignment="CENTER" prefHeight="34.0" prefWidth="600.0" spacing="4.0" VBox.vgrow="NEVER">
                      <children>
-                        <TextField prefHeight="10.0" prefWidth="548.0" HBox.hgrow="ALWAYS" />
-                        <Button mnemonicParsing="false" text="Button" />
+                        <TextField fx:id="inputTxt" prefHeight="10.0" prefWidth="548.0" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnSendMessage" mnemonicParsing="false" text="">
+                           <graphic>
+                              <FontIcon iconLiteral="mdmz-send" />
+                           </graphic>
+                        </Button>
                      </children>
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" />
