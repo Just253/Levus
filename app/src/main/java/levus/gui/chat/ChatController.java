@@ -86,8 +86,8 @@ public class ChatController {
         for (int i = 0; i < messages.length(); i++) {
             JSONObject message = messages.getJSONObject(i);
             addMessage(message);
-            chatBox.setVvalue(1.0);
         }
+        chatBox.setVvalue(1.0);
     }
 
     public void initialize() {
