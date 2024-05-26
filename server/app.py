@@ -20,4 +20,4 @@ for filename in os.listdir(routes_dir):
             print(f"Error al importar el módulo {filename}: {e}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
