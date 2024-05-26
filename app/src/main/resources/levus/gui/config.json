@@ -1,0 +1,27 @@
+[
+  {
+    "role": "user",
+    "message": "Hola, soy un usuario"
+  },
+  
+  {
+    "role": "assistant",
+    "message": "Hola, soy un bot"
+  },
+  {
+    "role": "user",
+    "message": "¿Cómo estás?"
+  },
+  {
+    "role": "assistant",
+    "message": "Estoy bien, gracias"
+  },
+  {
+    "role": "user",
+    "message": "¿Qué hora es?"
+  },
+  {
+    "role": "assistant",
+    "message": "No tengo reloj, pero puedo decirte que es un buen momento para aprender"
+  }
+]
