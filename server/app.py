@@ -1,8 +1,10 @@
 from flask import Flask, Blueprint
+from dotenv import load_dotenv
 import os
 import importlib
-
+load_dotenv()
 app = Flask(__name__)
+app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 # Importar automáticamente todas las clases de los directorios de api/routes/
 routes_dir = os.path.join(os.path.dirname(__file__), 'api', 'routes')
