@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.scene.control.Label;
@@ -71,10 +70,10 @@ public class ChatController {
         hBox.setMaxWidth(Double.MAX_VALUE);
         hBox.getChildren().add(label);
         if (role.equals("user")) {
-            //label.setText("User: " + text);
+                label.setText("User: " + text);
             hBox.setAlignment(Pos.CENTER_RIGHT);
         } else {
-            //label.setText("Assistant: " + text);
+            //      label.setText("Assistant: " + text);
             hBox.setAlignment(Pos.CENTER_LEFT);
         }
 

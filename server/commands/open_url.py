@@ -6,6 +6,3 @@ class BotCommand(Command):
     def execute(self, url):
         import os
         os.system(f"start {url}")
-        
-        
-      
