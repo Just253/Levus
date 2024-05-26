@@ -62,7 +62,7 @@ public class ChatController {
         label.setMaxWidth(Double.MAX_VALUE);
     
         label.setWrapText(true);
-        label.setStyle("-fx-background-color: #333333;");
+        //label.setStyle("-fx-background-color: #333333;");
         label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         label.setText(text);
         
@@ -70,8 +70,10 @@ public class ChatController {
         hBox.setMaxWidth(Double.MAX_VALUE);
         hBox.getChildren().add(label);
         if (role.equals("user")) {
+            label.getStyleClass().add("messages-user");
             hBox.setAlignment(Pos.CENTER_RIGHT);
         } else {
+            label.getStyleClass().add("messages-assistant");
             hBox.setAlignment(Pos.CENTER_LEFT);
         }
 

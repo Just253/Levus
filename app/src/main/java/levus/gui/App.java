@@ -12,7 +12,7 @@ import javafx.stage.Screen;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("app.fxml"));
 
         // Obtén las dimensiones de la pantalla

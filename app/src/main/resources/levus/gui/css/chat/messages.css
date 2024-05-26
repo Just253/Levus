@@ -6,3 +6,11 @@
   -fx-padding: 10px;
 
 }
+
+.messages-assistant{
+    -fx-background-color: -color-accent-7;
+}
+
+.messages-user{
+    -fx-background-color: -color-success-7;
+}
