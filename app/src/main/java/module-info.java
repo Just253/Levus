@@ -5,12 +5,12 @@ module levus.gui {
     
     requires org.json;
     requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.bootstrapfx.core;
     requires atlantafx.base;
     //requires com.almasb.fxgl.all;
     requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.material2;
+
 
     requires java.net.http;
 
