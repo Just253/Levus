@@ -1,5 +1,6 @@
 package levus.gui.chat;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,16 +9,13 @@ import java.net.URL;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import levus.gui.chat.ApiController;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
-import javafx.scene.control.ScrollPane;
 
 
 import javafx.fxml.FXML;
@@ -45,8 +43,18 @@ public class ChatController {
     @FXML
     private TextField inputTxt;
 
+    @FXML
+    private Button btnSendMessage;
+
+    @FXML
+    private ToggleButton micButton;
+
+    private VoskController voskController = new VoskController();
     private JSONArray messages;
     String config_file = "config.json";
+
+    public ChatController() throws IOException {
+    }
 
     public void loadChat(JSONObject messages) {
         addMessages(messages.getJSONArray("messages"));
@@ -154,7 +162,17 @@ public class ChatController {
     }
 
 
+
     public void initialize() {
         loadChatFromFile(config_file);
+
+        micButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                Task<Void> listenTask = voskController.listen();
+                new Thread(listenTask).start();
+            } else {
+                voskController.stopListening();
+            }
+        });
     }
 }

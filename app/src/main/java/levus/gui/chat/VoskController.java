@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.sound.sampled.*;
+import javafx.concurrent.Task;
 
 public class VoskController {
     private TextField textField;
@@ -16,59 +17,69 @@ public class VoskController {
     private ToggleButton toggleButton;
     private String modelName  = "vosk-model-small-es-0.42";
     private Model model = new Model(modelName);
+    private Task<Void> listenTask;
 
     public VoskController() throws IOException {
     }
 
-    public void Listen() {
-        LibVosk.setLogLevel(LogLevel.DEBUG);
+    public Task<Void> listen() {
+        listenTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                
+                LibVosk.setLogLevel(LogLevel.DEBUG);
 
-        AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 4,  44100, false);
-        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine microphone = null;
-        SourceDataLine speakers = null;
+                AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 4,  44100, false);
+                DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+                TargetDataLine microphone = null;
+                SourceDataLine speakers = null;
 
-        try {
-            Recognizer recognizer = new Recognizer(model, 12000000);
-            microphone = getMicrophone(format);
-            if(microphone == null) { return; }
-            microphone.start();
+                try {
+                    Recognizer recognizer = new Recognizer(model, 12000000);
+                    microphone = getMicrophone(format);
+                    if(microphone == null) { return null; }
+                    microphone.start();
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            int numBytesRead;
-            int CHUNK_SIZE = 1024;
-            int bytesRead = 0;
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    int numBytesRead;
+                    int CHUNK_SIZE = 1024;
+                    int bytesRead = 0;
 
-            DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
-            speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-            speakers.open(format);
-            speakers.start();
+                    DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
+                    speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+                    speakers.open(format);
+                    speakers.start();
 
-            byte[] b = new byte[4096];
-            while (bytesRead <= 100000000) {
-                numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
-                bytesRead += numBytesRead;
-                out.write(b, 0, numBytesRead);
+                    byte[] b = new byte[4096];
+                    while (bytesRead <= 100000000) {
+                        numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
+                        bytesRead += numBytesRead;
+                        out.write(b, 0, numBytesRead);
 
-                speakers.write(b, 0, numBytesRead);
+                        speakers.write(b, 0, numBytesRead);
 
-                if(recognizer.acceptWaveForm(b, numBytesRead)) {
-                    String result = recognizer.getResult();
-                    changeText(result);
-                    sendText();
-                }else{
-                    String partialResult = recognizer.getPartialResult();
-                    changeText(partialResult);
+                        if(recognizer.acceptWaveForm(b, numBytesRead)) {
+                            String result = recognizer.getResult();
+                            changeText(result);
+                            sendText();
+                        }else{
+                            String partialResult = recognizer.getPartialResult();
+                            changeText(partialResult);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }finally {
+                    speakers.drain();
+                    speakers.close();
+                    microphone.close();
                 }
+                return null;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            speakers.drain();
-            speakers.close();
-            microphone.close();
-        }
+        };
+        return listenTask;
     }
+    @SuppressWarnings("exports")
     public TargetDataLine getMicrophone(AudioFormat format) {
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
         TargetDataLine microphone = null;
@@ -108,4 +119,9 @@ public class VoskController {
         this.toggleButton = toggleButton;
     }
     
+    public void stopListening() {
+        if (listenTask != null) {
+            listenTask.cancel();
+        }
+    }
 }
