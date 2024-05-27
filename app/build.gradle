@@ -76,3 +76,5 @@ jlink {
 jlinkZip {
     group = 'distribution'
 }
+
+mainClassName = 'levus.gui.App'
