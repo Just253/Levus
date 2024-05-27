@@ -13,6 +13,7 @@ module levus.gui {
 
     requires java.net.http;
     requires vosk;
+    requires java.desktop;
 
     opens levus.gui to javafx.fxml;
     exports levus.gui.chat to javafx.fxml;
