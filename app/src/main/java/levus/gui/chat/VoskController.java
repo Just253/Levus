@@ -19,6 +19,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -34,7 +35,7 @@ public class VoskController {
     private Model model;
     private Task<Void> listenTask;
     private Thread thread;
-    private Boolean canChangeTxt = true;
+    private SendMessageFunction sendMessage;
 
     public VoskController() throws IOException, InterruptedException {
         model = getModel();
@@ -69,13 +70,12 @@ public class VoskController {
                     bytesRead += numBytesRead;
 
                     if(recognizer.acceptWaveForm(b, numBytesRead)){
-                        System.out.println(recognizer.getResult());
                         String resultJson = recognizer.getResult();
+                        System.out.println(resultJson);
                         JSONObject result = new JSONObject(resultJson);
                         String response = result.getString("text");
-                        canChangeTxt = false;
-                        changeText(response);
                         sendText(response);
+                        //changeText(response);
                     }else{
                         //System.out.println(recognizer.getPartialResult());
                         String partialResultJson = recognizer.getPartialResult();
@@ -116,15 +116,16 @@ public class VoskController {
         return microphone;
     }
     public void  sendText(String text) {
+        System.out.println("Sending text: " + text);
         Platform.runLater(() -> {
             this.textField.setText(text);
-            this.button.fire();
-            canChangeTxt = true;
+            this.sendMessage.apply();
+
         });
     }
     public void changeText(String text) {
         Platform.runLater(() -> {
-            if (canChangeTxt) this.textField.setText(text);
+            this.textField.setText(text);
         });
     }
 
@@ -204,5 +205,14 @@ public class VoskController {
         }
     
         Files.delete(tempZip);
+    }
+
+    public void setsendMessageFunction(SendMessageFunction sendMessage) {
+        this.sendMessage = sendMessage;
+    }
+
+    @FunctionalInterface
+    public interface SendMessageFunction {
+        void apply();
     }
 }

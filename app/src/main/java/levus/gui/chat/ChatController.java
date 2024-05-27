@@ -128,7 +128,13 @@ public class ChatController {
     }
 
     @FXML
-    public void sendMessage(ActionEvent event) {
+    public void sendMessageEvent(ActionEvent event) {
+        Platform.runLater(() -> {
+            sendMessage();
+        });
+    }
+
+    public void sendMessage(){
         String text = inputTxt.getText();
         if (text.isEmpty()) {
             return;
@@ -138,9 +144,11 @@ public class ChatController {
         message.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", text)));
         messages.put(message);
         inputTxt.clear();
+
         addMessage(message);
         chatBox.setVvalue(1.0);
         askAssistant();
+
     }
 
     public void askAssistant() {
@@ -181,7 +189,7 @@ public class ChatController {
         loadChatFromFile(config_file);
 
         voskController.setTextField(inputTxt);
-        voskController.setButton(btnSendMessage);
+        voskController.setsendMessageFunction(this::sendMessage);
         voskController.setToggleButton(micButton);
 
         micButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
