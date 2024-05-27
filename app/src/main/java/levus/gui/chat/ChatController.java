@@ -147,6 +147,7 @@ public class ChatController {
             response.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", messageResponse.getString("response"))));
             messages.put(response);
             addMessage(response);
+            chatBox.setVvalue(1.0);
         });
     
         new Thread(task).start();
