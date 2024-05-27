@@ -8,10 +8,7 @@ import org.vosk.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.TargetDataLine;
+import javax.sound.sampled.*;
 
 public class VoskController {
     private TextField textField;
@@ -28,13 +25,13 @@ public class VoskController {
 
         AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 4,  44100, false);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine microphone;
-        SourceDataLine speakers;
+        TargetDataLine microphone = null;
+        SourceDataLine speakers = null;
 
         try {
             Recognizer recognizer = new Recognizer(model, 12000000);
-            microphone = (TargetDataLine) AudioSystem.getLine(info);
-            microphone.open(format);
+            microphone = getMicrophone(format);
+            if(microphone == null) { return; }
             microphone.start();
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -71,8 +68,18 @@ public class VoskController {
             speakers.close();
             microphone.close();
         }
-
-
+    }
+    public TargetDataLine getMicrophone(AudioFormat format) {
+        DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+        TargetDataLine microphone = null;
+        try {
+            microphone = (TargetDataLine) AudioSystem.getLine(info);
+            microphone.open(format);
+            microphone.start();
+        } catch (LineUnavailableException e) {
+            e.printStackTrace();
+        }
+        return microphone;
     }
     public void  sendText() {
         this.button.fire();
