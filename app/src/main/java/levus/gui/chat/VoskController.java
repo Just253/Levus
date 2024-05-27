@@ -1,8 +1,10 @@
 package levus.gui.chat;
 
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import org.json.JSONObject;
 import org.vosk.*;
 
 import java.io.ByteArrayOutputStream;
@@ -31,6 +33,7 @@ public class VoskController {
     private String modelDir = "Models";
     private Model model;
     private Task<Void> listenTask;
+    private Thread thread;
 
     public VoskController() throws IOException, InterruptedException {
         model = getModel();
@@ -66,6 +69,9 @@ public class VoskController {
 
                     byte[] b = new byte[4096];
                     while (bytesRead <= 100000000) {
+                        if(Thread.currentThread().isInterrupted()) {
+                            break;
+                        }
                         numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
                         bytesRead += numBytesRead;
                         out.write(b, 0, numBytesRead);
@@ -74,15 +80,24 @@ public class VoskController {
 
                         if(recognizer.acceptWaveForm(b, numBytesRead)) {
                             String result = recognizer.getResult();
-                            changeText(result);
-                            sendText();
+                            Platform.runLater(() -> {
+                                changeText(result);
+                                sendText();
+                            });
                         }else{
-                            String partialResult = recognizer.getPartialResult();
-                            changeText(partialResult);
+                            String partialResultJson = recognizer.getPartialResult();
+                            JSONObject json = new JSONObject(partialResultJson);
+                            String partialResult = json.getString("partial");
+                            System.out.println(partialResultJson);
+                            Platform.runLater(() -> {
+                                changeText(partialResult);
+                            });
                         }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                }catch(InterruptedException e){
+                    Thread.currentThread().interrupt();
                 }finally {
                     speakers.drain();
                     speakers.close();
@@ -93,6 +108,16 @@ public class VoskController {
         };
         return listenTask;
     }
+    
+    public void setThread(Thread thread) {
+        this.thread = thread;
+    }
+
+    public Thread getThread() {
+        return thread;
+    }
+
+
     @SuppressWarnings("exports")
     public TargetDataLine getMicrophone(AudioFormat format) {
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
@@ -134,8 +159,9 @@ public class VoskController {
     }
     
     public void stopListening() {
-        if (listenTask != null) {
-            listenTask.cancel();
+        if (this.thread != null) {
+            this.thread.interrupt();
+            this.thread = null;
         }
     }
 

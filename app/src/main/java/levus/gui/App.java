@@ -3,6 +3,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import levus.gui.chat.ChatController;
+
 import java.io.IOException;
 import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
@@ -18,7 +20,9 @@ public class App extends Application {
         // Obtén las dimensiones de la pantalla
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(fxmlLoader.load(), screenBounds.getWidth()/4, screenBounds.getHeight()/4);
-
+        ChatController controller = fxmlLoader.getController();
+        controller.setPrimaryStage(stage);
+        
         //stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         stage.setTitle("Levus");
         stage.setScene(scene);

@@ -1,4 +1,5 @@
 package levus.gui.chat;
+import java.beans.EventHandler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,10 +11,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.scene.layout.VBox;
-import levus.gui.chat.ApiController;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 
@@ -51,6 +53,8 @@ public class ChatController {
 
     private VoskController voskController = new VoskController();
     private JSONArray messages;
+    private Stage primaryStage;
+
     String config_file = "config.json";
 
     public ChatController() throws IOException, InterruptedException {
@@ -161,19 +165,30 @@ public class ChatController {
         new Thread(task).start();
     }
 
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        initStage();
+    }
 
+    private void initStage() {
+        primaryStage.setOnCloseRequest(event -> {
+            voskController.stopListening();
+        });
+    }
 
+    @FXML
     public void initialize() {
         loadChatFromFile(config_file);
 
         voskController.setTextField(inputTxt);
         voskController.setButton(btnSendMessage);
         voskController.setToggleButton(micButton);
-        
+
         micButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 Task<Void> listenTask = voskController.listen();
-                new Thread(listenTask).start();
+                voskController.setThread(new Thread(listenTask));
+                voskController.getThread().start();
             } else {
                 voskController.stopListening();
             }
