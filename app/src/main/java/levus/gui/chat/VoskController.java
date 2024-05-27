@@ -6,7 +6,19 @@ import javafx.scene.control.ToggleButton;
 import org.vosk.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.sound.sampled.*;
 import javafx.concurrent.Task;
@@ -16,10 +28,12 @@ public class VoskController {
     private Button button;
     private ToggleButton toggleButton;
     private String modelName  = "vosk-model-small-es-0.42";
-    private Model model = new Model(modelName);
+    private String modelDir = "Models";
+    private Model model;
     private Task<Void> listenTask;
 
-    public VoskController() throws IOException {
+    public VoskController() throws IOException, InterruptedException {
+        model = getModel();
     }
 
     public Task<Void> listen() {
@@ -123,5 +137,56 @@ public class VoskController {
         if (listenTask != null) {
             listenTask.cancel();
         }
+    }
+
+    private Model getModel() throws IOException, InterruptedException {
+        Path modelPath = Paths.get(modelDir, modelName).toAbsolutePath();
+        System.out.println("Model path: " + modelPath);
+        if (!Files.exists(modelPath)) {
+            downloadAndExtractModel();
+        }
+        return new Model(modelPath.toString());
+    }
+
+    private void downloadAndExtractModel() throws IOException, InterruptedException {
+        String modelUrl = "https://alphacephei.com/kaldi/models/" + modelName + ".zip";
+        Path tempZip = Files.createTempFile("model", ".zip");
+    
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(modelUrl))
+                .build();
+        HttpResponse<Path> response = client.send(request, HttpResponse.BodyHandlers.ofFile(tempZip));
+    
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(tempZip.toFile()))) {
+            ZipEntry entry = zis.getNextEntry();
+            while (entry != null) {
+                // Modificación aquí: elimina el nombre del modelo del nombre de la entrada
+                String entryName = entry.getName().replace(modelName + "/", "");
+                File file = new File(Paths.get(modelDir, modelName).toString() ,entryName);
+                System.out.println("Unzipping to " + file.getAbsolutePath());
+                if (entry.isDirectory()) {
+                    if (!file.isDirectory() && !file.mkdirs()) {
+                        throw new IOException("Failed to create directory " + file);
+                    }
+                } else {
+                    File parent = file.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("Failed to create directory " + parent);
+                    }
+    
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        byte[] buffer = new byte[1024];
+                        int length;
+                        while ((length = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, length);
+                        }
+                    }
+                }
+                entry = zis.getNextEntry();
+            }
+        }
+    
+        Files.delete(tempZip);
     }
 }

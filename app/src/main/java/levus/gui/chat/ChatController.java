@@ -53,7 +53,7 @@ public class ChatController {
     private JSONArray messages;
     String config_file = "config.json";
 
-    public ChatController() throws IOException {
+    public ChatController() throws IOException, InterruptedException {
     }
 
     public void loadChat(JSONObject messages) {
@@ -166,6 +166,10 @@ public class ChatController {
     public void initialize() {
         loadChatFromFile(config_file);
 
+        voskController.setTextField(inputTxt);
+        voskController.setButton(btnSendMessage);
+        voskController.setToggleButton(micButton);
+        
         micButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 Task<Void> listenTask = voskController.listen();
