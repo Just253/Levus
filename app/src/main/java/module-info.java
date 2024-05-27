@@ -11,10 +11,8 @@ module levus.gui {
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.material2;
 
-
     requires java.net.http;
-
-
+    requires vosk;
 
     opens levus.gui to javafx.fxml;
     exports levus.gui.chat to javafx.fxml;

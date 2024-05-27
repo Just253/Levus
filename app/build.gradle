@@ -56,7 +56,9 @@ dependencies {
     implementation('io.github.mkpaz:atlantafx-base:2.0.1')
     implementation('org.json:json:20240303')
 
-
+    implementation group: 'net.java.dev.jna', name: 'jna', version: '5.7.0'
+    implementation group: 'com.alphacephei', name: 'vosk', version: '0.3.45'
+    
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
