@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -100,6 +102,9 @@ public class ChatController {
                 chatHistory.getChildren().add(hBox);
             }
         }
+        Platform.runLater(() -> {
+            chatBox.setVvalue(1.0);
+        });
     }
 
     public void addMessages(JSONArray messages) {
@@ -120,20 +125,31 @@ public class ChatController {
         message.put("role", "user");
         message.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", text)));
         messages.put(message);
-        addMessage(message);
         inputTxt.clear();
+        addMessage(message);
+        chatBox.setVvalue(1.0);
         askAssistant();
     }
 
     public void askAssistant() {
-        JSONObject response = new JSONObject();
-        response.put("role", "assistant");
-        ApiController api = new ApiController();
-        JSONObject messageResponse = api.sendMessage(messages);
-        response.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", messageResponse.getString("response"))));
-        //response.put("message", messageResponse.getString("response"));
-        messages.put(response);
-        addMessage(response);
+        Task<JSONObject> task = new Task<>() {
+            @Override
+            protected JSONObject call() throws Exception {
+                ApiController api = new ApiController();
+                return api.sendMessage(messages);
+            }
+        };
+    
+        task.setOnSucceeded(event -> {
+            JSONObject messageResponse = task.getValue();
+            JSONObject response = new JSONObject();
+            response.put("role", "assistant");
+            response.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", messageResponse.getString("response"))));
+            messages.put(response);
+            addMessage(response);
+        });
+    
+        new Thread(task).start();
     }
 
 
