@@ -34,6 +34,7 @@ public class VoskController {
     private Model model;
     private Task<Void> listenTask;
     private Thread thread;
+    private Boolean canChangeTxt = true;
 
     public VoskController() throws IOException, InterruptedException {
         model = getModel();
@@ -46,63 +47,48 @@ public class VoskController {
                 
                 LibVosk.setLogLevel(LogLevel.DEBUG);
 
-                AudioFormat format = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 16000, 16, 2, 4,  44100, false);
+                AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
                 DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-                TargetDataLine microphone = null;
-                SourceDataLine speakers = null;
+                TargetDataLine microphone;
 
-                try {
-                    Recognizer recognizer = new Recognizer(model, 12000000);
-                    microphone = getMicrophone(format);
-                    if(microphone == null) { return null; }
-                    microphone.start();
+                Recognizer recognizer = new Recognizer(model, 16000);
 
-                    ByteArrayOutputStream out = new ByteArrayOutputStream();
-                    int numBytesRead;
-                    int CHUNK_SIZE = 1024;
-                    int bytesRead = 0;
+                microphone = getMicrophone(format);
+                microphone.open(format);
+                microphone.start();
 
-                    DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
-                    speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-                    speakers.open(format);
-                    speakers.start();
+                int numBytesRead;
+                int CHUNK_SIZE = 4096;
+                int bytesRead = 0;
 
-                    byte[] b = new byte[4096];
-                    while (bytesRead <= 100000000) {
-                        if(Thread.currentThread().isInterrupted()) {
-                            break;
-                        }
-                        numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
-                        bytesRead += numBytesRead;
-                        out.write(b, 0, numBytesRead);
+                byte[] b = new byte[4096];
 
-                        speakers.write(b, 0, numBytesRead);
+                while(thread != null && !thread.isInterrupted()){
+                    numBytesRead = microphone.read(b, 0, CHUNK_SIZE);
 
-                        if(recognizer.acceptWaveForm(b, numBytesRead)) {
-                            String result = recognizer.getResult();
-                            Platform.runLater(() -> {
-                                changeText(result);
-                                sendText();
-                            });
-                        }else{
-                            String partialResultJson = recognizer.getPartialResult();
-                            JSONObject json = new JSONObject(partialResultJson);
-                            String partialResult = json.getString("partial");
-                            System.out.println(partialResultJson);
-                            Platform.runLater(() -> {
-                                changeText(partialResult);
-                            });
-                        }
+                    bytesRead += numBytesRead;
+
+                    if(recognizer.acceptWaveForm(b, numBytesRead)){
+                        System.out.println(recognizer.getResult());
+                        String resultJson = recognizer.getResult();
+                        JSONObject result = new JSONObject(resultJson);
+                        String response = result.getString("text");
+                        canChangeTxt = false;
+                        changeText(response);
+                        sendText(response);
+                    }else{
+                        //System.out.println(recognizer.getPartialResult());
+                        String partialResultJson = recognizer.getPartialResult();
+                        JSONObject partialResult = new JSONObject(partialResultJson);
+                        String response = partialResult.getString("partial");
+                        changeText(response);
+                        
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }catch(InterruptedException e){
-                    Thread.currentThread().interrupt();
-                }finally {
-                    speakers.drain();
-                    speakers.close();
-                    microphone.close();
                 }
+
+                //System.out.println(recognizer.getFinalResult());
+
+                microphone.close();
                 return null;
             }
         };
@@ -124,18 +110,22 @@ public class VoskController {
         TargetDataLine microphone = null;
         try {
             microphone = (TargetDataLine) AudioSystem.getLine(info);
-            microphone.open(format);
-            microphone.start();
         } catch (LineUnavailableException e) {
             e.printStackTrace();
         }
         return microphone;
     }
-    public void  sendText() {
-        this.button.fire();
+    public void  sendText(String text) {
+        Platform.runLater(() -> {
+            this.textField.setText(text);
+            this.button.fire();
+            canChangeTxt = true;
+        });
     }
     public void changeText(String text) {
-        textField.setText(text);
+        Platform.runLater(() -> {
+            if (canChangeTxt) this.textField.setText(text);
+        });
     }
 
     public void setTextField(TextField textField) {
