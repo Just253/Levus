@@ -13,7 +13,7 @@
     "content": [
       {
         "type": "text",
-        "text": "Que hora es"
+        "text": "¿Cómo estas?"
       }
     ]
   },
@@ -22,7 +22,7 @@
     "content": [
       {
         "type": "text",
-        "text": "Son las 4:40pm"
+        "text": "Estoy bien, gracias"
       }
     ]
   },
@@ -31,7 +31,16 @@
     "content": [
       {
         "type": "text",
-        "text": "Que hora fue hace medio dia"
+        "text": "¿Qué hora es?"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "No tengo reloj, pero puedo decirte que es un buen momento para aprender"
       }
     ]
   }
