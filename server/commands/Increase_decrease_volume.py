@@ -3,11 +3,11 @@ import ctypes
 from command import Command
 class BotCommand(Command):
     name="volume change"
-    description="este comando modifica el volumen de la PC"
+    description="este comando modifica el volumen de la aplicacion que lo ejecuta"
     
     def execute(self,nuevo_volumen):
-        BotCommand.obtener_volumen()
-        BotCommand.cambiar_volumen(nuevo_volumen)
+        #self.obtener_volumen()
+        self.cambiar_volumen(nuevo_volumen)
 
     def obtener_volumen(self):
         #declaro una constante que declara cual es el identificador de audio del dispositivo el audio
@@ -29,4 +29,3 @@ class BotCommand(Command):
         # Convertir el porcentaje de volumen a un valor entre 0 y 65535
         nuevo_volumen = int(nuevo_volumen / 100 * 65535)
         ctypes.windll.winmm.waveOutSetVolume(0, nuevo_volumen)
-    
