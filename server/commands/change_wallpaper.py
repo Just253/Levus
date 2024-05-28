@@ -2,7 +2,7 @@ import os
 import ctypes
 from command import Command
 
-class ChangeWallpaperCommand(Command):
+class BotCommand(Command):
     name = "change_wallpaper"
     description = "Changes the wallpaper"
     def execute(self, directory, image_name):

@@ -2,7 +2,7 @@ from command import Command
 import os
 import shutil
 
-class CombinedCommand(Command):
+class BotCommand(Command):
     name="Files commands"
     description="This command executes file operations"
     

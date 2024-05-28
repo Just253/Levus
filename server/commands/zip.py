@@ -1,7 +1,7 @@
 from command import Command
 import zipfile
 
-class WinRARCommand(Command):
+class BotCommand(Command):
     name = "ZipFuntions"
     description = "This command executes zip operations"
     

@@ -2,7 +2,7 @@ import os
 import subprocess
 from command import Command
 
-class RunExeCommand(Command):
+class BotCommand(Command):
     name = "run_exe"
     description = "Runs a specified .exe file"
     def execute(self, directory, program_name):
