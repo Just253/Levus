@@ -51,3 +51,40 @@ sequenceDiagram
         "error": "No se pudo completar la solicitud"
     }
 ```
+
+### sequence diagram for process_id
+
+```mermaid
+sequenceDiagram
+    participant GUI
+    participant chat.py
+    participant worker.py
+    participant status.py
+    participant interaction.py
+    participant OPENAI
+    participant command.py
+    
+    GUI->>chat.py: User input
+    chat.py->>worker.py: User input
+    chat.py->>GUI: process_id
+
+    worker.py->>status.py: Update process status
+    GUI->>status.py: process_id
+    status.py->>GUI: process status
+    worker.py->>interaction.py: User input
+    interaction.py->>OPENAI: User input
+    OPENAI->>interaction.py: Bot response
+    interaction.py->>worker.py: Update process status
+    worker.py->>status.py: Update process status
+
+    GUI->>status.py: process_id
+    status.py->>GUI: process status
+    
+    interaction.py->>command.py: Execute command
+    command.py->>interaction.py: Command response
+    interaction.py->>worker.py: Update process status
+    worker.py->>status.py: Update process status
+    GUI ->> status.py: process_id
+    status.py->>GUI: process status
+
+```
