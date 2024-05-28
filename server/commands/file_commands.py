@@ -6,6 +6,24 @@ class BotCommand(Command):
     name="Files commands"
     description="This command executes file operations"
     
+    def __init__(self):
+        self.operations = {
+            'read': self.read_file,
+            'create': self.create_file,
+            'delete': self.delete_file,
+            'copy': self.copy_file,
+            'move': self.move_file,
+            'list': self.list_files,
+            'size': self.file_size
+        }
+
+    def execute(self, operation, *args):
+        func = self.operations.get(operation)
+        if func:
+            func(*args)
+        else:
+            print(f"Unknown operation: {operation}")
+
     def read_file(self, filename):
         with open(filename, 'r') as file:
             print(file.read())
