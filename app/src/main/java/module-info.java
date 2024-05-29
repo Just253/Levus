@@ -16,7 +16,10 @@ module levus.gui {
     requires java.desktop;
 
     opens levus.gui to javafx.fxml;
-    exports levus.gui.chat to javafx.fxml;
     opens levus.gui.chat to javafx.fxml;
+    opens levus.gui.titleBar to javafx.fxml;
+
+    exports levus.gui.titleBar to javafx.fxml;
+    exports levus.gui.chat to javafx.fxml;
     exports levus.gui;
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import javafx.scene.layout.Region;
 
 
 public class App extends Application {
@@ -17,13 +18,17 @@ public class App extends Application {
         Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("app.fxml"));
 
+        // Establece un tamaño mínimo para la ventana
+        stage.setMinWidth(400);
+        stage.setMinHeight(400);
+
         // Obtén las dimensiones de la pantalla
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(fxmlLoader.load(), screenBounds.getWidth()/4, screenBounds.getHeight()/4);
         ChatController controller = fxmlLoader.getController();
         controller.setPrimaryStage(stage);
         
-        //stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
         stage.setTitle("Levus");
         stage.setScene(scene);
         stage.show();
