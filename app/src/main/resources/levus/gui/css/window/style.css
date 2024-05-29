@@ -1,4 +1,11 @@
-#MainContainer {
-  
-  
+/*#titleBar {
+    -fx-background-color: -color-accent-9;
 }
+
+#titleBar * {
+    -fx-background-color: -color-accent-9;
+}
+
+FontIcon {
+    -fx-icon-color: black;
+}*/

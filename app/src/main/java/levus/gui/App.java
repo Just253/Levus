@@ -2,7 +2,9 @@ package levus.gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import levus.gui.chat.ChatController;
 
 import java.io.IOException;
@@ -10,6 +12,7 @@ import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 import javafx.scene.layout.Region;
+import levus.gui.helper.ResizeHelper;
 
 
 public class App extends Application {
@@ -27,10 +30,12 @@ public class App extends Application {
         Scene scene = new Scene(fxmlLoader.load(), screenBounds.getWidth()/4, screenBounds.getHeight()/4);
         ChatController controller = fxmlLoader.getController();
         controller.setPrimaryStage(stage);
-        
-        stage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        scene.setFill(Color.TRANSPARENT);
+        stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("Levus");
         stage.setScene(scene);
+        ResizeHelper.addResizeListener(stage);
         stage.show();
     }
 

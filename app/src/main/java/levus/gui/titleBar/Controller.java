@@ -21,9 +21,6 @@ public class Controller {
     @FXML
     private ToolBar titleBar;
 
-    private double xOffset = 0;
-    private double yOffset = 0;
-
     @FXML
     public void initialize() {
         // Cerrar la ventana cuando se haga clic en el botón de cierre
@@ -36,17 +33,6 @@ public class Controller {
         maximizeBtn.setOnAction(event -> {
             Stage stage = (Stage) maximizeBtn.getScene().getWindow();
             stage.setMaximized(!stage.isMaximized());
-        });
-
-        // Hacer que la ventana sea arrastrable
-        titleBar.setOnMousePressed(event -> {
-            xOffset = event.getSceneX();
-            yOffset = event.getSceneY();
-        });
-        titleBar.setOnMouseDragged(event -> {
-            Stage stage = (Stage) titleBar.getScene().getWindow();
-            stage.setX(event.getScreenX() - xOffset);
-            stage.setY(event.getScreenY() - yOffset);
         });
     }
 }

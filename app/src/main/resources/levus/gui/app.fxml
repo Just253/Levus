@@ -37,7 +37,7 @@
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
-<VBox fx:id="MainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="levus.gui.chat.ChatController">
+<VBox fx:id="MainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-radius: 10;" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="levus.gui.chat.ChatController">
    <children>
       <fx:include source="fxml/titleBar.fxml" VBox.vgrow="ALWAYS" />
       <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
@@ -48,7 +48,7 @@
                      <content>
                         <VBox fx:id="chatHistory" alignment="BOTTOM_LEFT" prefHeight="281.0" prefWidth="228.0" spacing="3.0">
                            <Label alignment="CENTER" styleClass="user-message messages" text="Hola, soy el usuario" VBox.vgrow="ALWAYS" />
-                           <Label alignment="TOP_LEFT" contentDisplay="RIGHT" prefWidth="100.0" styleClass="system-message messages" text="Este es un mensaje del sistema" wrapText="true" VBox.vgrow="ALWAYS" />
+                           <Label alignment="TOP_LEFT" contentDisplay="RIGHT" prefWidth="100.0" styleClass="system-message messages" text="Este es un mensaje del sistema" VBox.vgrow="ALWAYS" />
                            <HBox maxWidth="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0">
                               <children>
                                  <Label alignment="TOP_LEFT" styleClass="messages-assistant" text="Hola, soy el bot asdasdasdasd asd" wrapText="true">
@@ -67,6 +67,12 @@
                            </HBox>
                         </VBox>
                      </content>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
                   </ScrollPane>
                   <HBox fx:id="userInputBox" alignment="CENTER" prefHeight="34.0" prefWidth="600.0" spacing="4.0" VBox.vgrow="NEVER">
                      <children>
@@ -85,6 +91,9 @@
                      </opaqueInsets>
                   </HBox>
                </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </VBox>
          </children></HBox>
       <HBox fx:id="micAndCamControlBox" alignment="CENTER" prefHeight="64.0" prefWidth="600.0" spacing="20.0" VBox.vgrow="NEVER">
@@ -107,4 +116,7 @@
             </ToggleButton>
          </children></HBox>
    </children>
+   <padding>
+      <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+   </padding>
 </VBox>
