@@ -7,11 +7,7 @@ import javafx.scene.control.ToggleButton;
 import org.json.JSONObject;
 import org.vosk.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -115,17 +111,19 @@ public class VoskController {
         }
         return microphone;
     }
-    public void  sendText(String text) {
-        System.out.println("Sending text: " + text);
+    public void  sendText(String text) throws UnsupportedEncodingException {
+        String unicodeText = new String(text.getBytes(), "UTF-8"); 
+        System.out.println("Sending text: " + unicodeText);
         Platform.runLater(() -> {
-            this.textField.setText(text);
+            this.textField.setText(unicodeText);
             this.sendMessage.apply();
 
         });
     }
-    public void changeText(String text) {
+    public void changeText(String text) throws UnsupportedEncodingException {
+        String unicodeText = new String(text.getBytes(), "UTF-8"); 
         Platform.runLater(() -> {
-            this.textField.setText(text);
+            this.textField.setText(unicodeText);
         });
     }
 
