@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+
+<ToolBar fx:id="titleBar" maxHeight="-Infinity" minHeight="-Infinity" nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="levus.gui.titleBar.Controller">
+   <items>
+      <Button fx:id="closeBtn" styleClass="flat">
+         <graphic>
+            <FontIcon iconLiteral="mdal-close" />
+         </graphic>
+      </Button>
+      <Button fx:id="maximizeBtn" styleClass="flat">
+         <graphic>
+            <FontIcon iconLiteral="mdal-crop_square" />
+         </graphic>
+      </Button>
+      <Button fx:id="minimizeBtn" prefHeight="20.0" styleClass="flat">
+         <graphic>
+            <FontIcon iconLiteral="mdmz-minimize" />
+         </graphic>
+      </Button>
+   </items>
+</ToolBar>
