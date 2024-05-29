@@ -1,11 +1,9 @@
 package levus.gui.chat;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,11 +13,11 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class ApiController {
-  private String url = "localhost:5000";
+  private final String URL_HOST = "http://localhost:5000";
 
     public JSONObject sendMessage(JSONArray messages) {
         String model = "gpt-3.5-turbo-0125";
-        String url = "http://" + this.url + "/chat";
+        String url = this.URL_HOST + "/chat";
         JSONArray filteredMessages = filterMessages(messages);
         Map<Object, Object> data = new HashMap<>();
         data.put("model", model);
