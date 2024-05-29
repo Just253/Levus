@@ -37,7 +37,9 @@ public class ApiController {
             return new JSONObject(response.body());
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            JSONObject error = new JSONObject();    
+            error.put("response", e.getMessage());
+            return  error;
         }
     };
     public JSONArray filterMessages(JSONArray messages){
