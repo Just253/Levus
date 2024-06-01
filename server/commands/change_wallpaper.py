@@ -1,6 +1,6 @@
 import os
 import ctypes
-from .command import Command
+from command import Command
 
 class BotCommand(Command):
     name = "change_wallpaper"

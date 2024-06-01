@@ -1,6 +1,7 @@
 from command import Command
-import os
+from os import path, listdir, remove
 import shutil
+# from pyttsx3 import init 
 
 class BotCommand(Command):
     name="Files commands"
@@ -27,14 +28,20 @@ class BotCommand(Command):
     def read_file(self, filename):
         with open(filename, 'r') as file:
             print(file.read())
+        
+            #content = file.read()
 
+        #engine = init()
+        #engine.say(content)
+        #engine.runAndWait()
+        
     def create_file(self, filename, content=''):
         with open(filename, 'w') as file:
             file.write(content)
 
     def delete_file(self, filename):
-        if os.path.isfile(filename):
-            os.remove(filename)
+        if path.isfile(filename):
+            remove(filename)
         else:
             print(f"{filename} not found.")
 
@@ -45,10 +52,22 @@ class BotCommand(Command):
         shutil.move(source_filename, destination_filename)
 
     def list_files(self, directory):
-        files = os.listdir(directory)
+        files = listdir(directory)
         for file in files:
             print(file)
+        
+        # message = f"Los archivos en el directorio {directory} son: {files}"
+        
+        # engine = init()
+        # engine.say(message)
+        # engine.runAndWait()
 
     def file_size(self, filename):
-        size = os.path.getsize(filename)
-        print(f"The size of {filename} is {size} bytes.")
+        size = path.getsize(filename) / (1024 * 1024)
+        print(f"El tamaño del archivo, {filename} es de {size} megabytes")
+        
+        # message = f"El tamaño del archivo, {filename} es de {size} megabytes"
+        
+        # engine = init()
+        # engine.say(message)
+        # engine.runAndWait()
