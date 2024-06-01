@@ -12,25 +12,25 @@ def get_db():
 @status_bp.route('/status/<process_id>', methods=['GET'])
 def get_status(process_id):
     db = get_db()
-    process = db.Query()
+    process = Query()
     status = db.search(process.process_id == process_id)
     if status:
         status = status[0]  # Get the first (and likely only) status
         if status['status'] == 'completed':
             return jsonify({
-                "state": status['status'],
+                "status": status['status'],
                 "process_id": status['process_id'],
                 "response": status.get('response', '')
             })
         elif status['status'] == 'pending':
             return jsonify({
-                "state": status['status'],
+                "status": status['status'],
                 "process_id": status['process_id'],
                 "preview": status.get('preview', '')
             })
         elif status['status'] == 'error':
             return jsonify({
-                "state": status['status'],
+                "status": status['status'],
                 "process_id": status['process_id'],
                 "preview": status.get('preview', ''),
                 "error": status.get('error', '')
