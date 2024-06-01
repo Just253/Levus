@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 public class ApiController {
-  private final String URL_HOST = "http://localhost:5000";
+    private final String URL_HOST = "http://localhost:5000";
 
     public JSONObject sendMessage(JSONArray messages) {
         String model = "gpt-3.5-turbo-0125";
@@ -32,14 +32,30 @@ public class ApiController {
                 .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return new JSONObject(response.body());
+            JSONObject jsonResponse = new JSONObject(response.body());
+            return jsonResponse;
         } catch (Exception e) {
             e.printStackTrace();
             JSONObject error = new JSONObject();    
             error.put("response", e.getMessage());
             return  error;
         }
-    };
+    }
+
+    public String getProcessId(JSONObject response) {
+        return response.getString("process_id");
+    }
+
+    public JSONObject getStatus(String processId) throws Exception {
+        String url = this.URL_HOST + "/status/" + processId;
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return new JSONObject(response.body());
+    }
     public JSONArray filterMessages(JSONArray messages){
         return filterMessages(messages, (byte) 9);
     }
