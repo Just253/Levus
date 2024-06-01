@@ -1,4 +1,4 @@
-from command import Command
+from .command import Command
 from os import path, listdir, remove
 import shutil
 # from pyttsx3 import init 
@@ -18,7 +18,13 @@ class BotCommand(Command):
             'size': self.file_size
         }
 
-    def execute(self, operation, *args):
+    def execute(self, operation: str, *args: list):
+        """
+        :param operation: La operación a realizar {read, create, delete, copy, move, list, size}
+        :type operation: string
+        :param args: Los argumentos necesarios para la operación
+        :type args: list {read: filename, create: filename, content, delete: filename, copy: source_filename, destination_filename, move: source_filename, destination_filename, list: directory, size: filename}
+        """
         func = self.operations.get(operation)
         if func:
             func(*args)
