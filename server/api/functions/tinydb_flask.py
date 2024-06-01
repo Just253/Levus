@@ -126,7 +126,7 @@ class TinyDB:
         app.config.setdefault("TINYDB_DATABASE_PATH", "flask.db")
         app.config.setdefault("TINYDB_DATABASE_TABLE", "app")
         app.config.setdefault("TINYDB_DATABASE_STORAGE", tinydb.storages.JSONStorage)
-        print(app.config["TINYDB_DATABASE_STORAGE"])
+        #print(app.config["TINYDB_DATABASE_STORAGE"])
         self.db = tinydb.TinyDB(
             app.config["TINYDB_DATABASE_PATH"],
             storage=app.config["TINYDB_DATABASE_STORAGE"],

@@ -22,8 +22,8 @@ def get_response_from_openai(messages, process_id, tools=None, tool_choice=None,
             message = chunk.choices[0].delta.content
             if message != None:
                 chunk_messages += message
-                update_status(process_id=process_id, response=chunk_messages)
-        update_status(process_id=process_id, status="completed")
+                update_status(process_id=process_id, preview=chunk_messages)
+        update_status(process_id=process_id, status="completed", response=chunk_messages, preview="")
     except Exception as e:
         update_status(process_id=process_id, status="error", error=str(e))
         print("Unable to generate ChatCompletion response")
