@@ -7,7 +7,7 @@ from api.functions.tinydb_flask import TinyDB
 load_dotenv()
 app = Flask(__name__)
 app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-db = TinyDB(app).get_db()
+#db = TinyDB(app).get_db()
 
 # Importar automáticamente todas las clases de los directorios de api/routes/
 
