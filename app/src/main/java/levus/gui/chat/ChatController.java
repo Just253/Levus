@@ -1,11 +1,11 @@
 package levus.gui.chat;
-import java.beans.EventHandler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -51,7 +51,7 @@ public class ChatController {
     @FXML
     private ToggleButton micButton;
 
-    private VoskController voskController = new VoskController();
+    private final VoskController voskController = new VoskController();
     private JSONArray messages;
     private Stage primaryStage;
 
@@ -79,6 +79,33 @@ public class ChatController {
             e.printStackTrace();
         }
     }
+    public Label makeLabel(String text, String role) {
+        Label label = new Label();
+        label.setMaxWidth(chatHistory.getWidth() * 0.9);
+        label.setMaxHeight(Double.MAX_VALUE);
+        label.setWrapText(true);
+        label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        label.setText(text);
+
+        chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
+            label.setMaxWidth(newValue.doubleValue() * 0.9);
+        });
+
+        HBox hBox = new HBox();
+        hBox.setMinWidth(100);
+        hBox.setMaxWidth(Double.MAX_VALUE);
+
+        hBox.getChildren().add(label);
+        if (role.equals("user")) {
+            label.getStyleClass().add("messages-user");
+            hBox.setAlignment(Pos.CENTER_RIGHT);
+        } else {
+            label.getStyleClass().add("messages-assistant");
+            hBox.setAlignment(Pos.CENTER_LEFT);
+        }
+        chatHistory.getChildren().add(hBox);
+        return label;
+    }
 
     public void addMessage(JSONObject message) {
         String role = message.getString("role");
@@ -87,36 +114,13 @@ public class ChatController {
             JSONObject item = content.getJSONObject(i);
             if (item.getString("type").equals("text")) {
                 String text = item.getString("text");
-                Label label = new Label();
-                label.setMaxWidth(chatHistory.getWidth() * 0.9);
-                label.setMaxHeight(Double.MAX_VALUE);
-                label.setWrapText(true);
-                label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
-                label.setText(text);
-
-                chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
-                    label.setMaxWidth(newValue.doubleValue() * 0.9);
-                });
-
-                HBox hBox = new HBox();
-                hBox.setMinWidth(100);
-                hBox.setMaxWidth(Double.MAX_VALUE);
-
-                hBox.getChildren().add(label);
-                if (role.equals("user")) {
-                    label.getStyleClass().add("messages-user");
-                    hBox.setAlignment(Pos.CENTER_RIGHT);
-                } else {
-                    label.getStyleClass().add("messages-assistant");
-                    hBox.setAlignment(Pos.CENTER_LEFT);
-                }
-
-                chatHistory.getChildren().add(hBox);
+                makeLabel(text, role);
             }
+            Platform.runLater(() -> {
+                chatBox.setVvalue(1.0);
+            }); 
         }
-        Platform.runLater(() -> {
-            chatBox.setVvalue(1.0);
-        });
+    
     }
 
     public void addMessages(JSONArray messages) {
@@ -146,7 +150,9 @@ public class ChatController {
         inputTxt.clear();
 
         addMessage(message);
-        chatBox.setVvalue(1.0);
+        Platform.runLater(() -> {
+            chatBox.setVvalue(1.0);
+        }); 
         askAssistant();
 
     }
@@ -156,20 +162,36 @@ public class ChatController {
             @Override
             protected JSONObject call() throws Exception {
                 ApiController api = new ApiController();
-                return api.sendMessage(messages);
+                JSONObject response = api.sendMessage(messages);
+                String processId = api.getProcessId(response);
+                AtomicReference<Label> label = new AtomicReference<>();
+                Platform.runLater(() -> {
+                    label.set(makeLabel("...", "assistant"));
+                    chatBox.setVvalue(1.0);
+                }); 
+                while (true) {
+                    JSONObject status = api.getStatus(processId);
+                    if (status.getString("status").equals("completed")) {
+                        break;
+                    }
+                    final String preview = status.getString("preview");
+                    Platform.runLater(() -> {
+                        label.get().setText(preview);
+                    }); 
+                    Thread.sleep(150);
+                }
+                JSONObject finalResponse = api.getStatus(processId);
+                Platform.runLater(() -> {
+                    label.get().setText(finalResponse.getString("response"));
+                });
+                return response;
             }
         };
-    
-        task.setOnSucceeded(event -> {
-            JSONObject messageResponse = task.getValue();
-            JSONObject response = new JSONObject();
-            response.put("role", "assistant");
-            response.put("content", new JSONArray().put(new JSONObject().put("type", "text").put("text", messageResponse.getString("response"))));
-            messages.put(response);
-            addMessage(response);
-            chatBox.setVvalue(1.0);
+        task.setOnSucceeded(EventHandler -> {
+            Platform.runLater(() -> {
+                chatBox.setVvalue(1.0);
+            });  
         });
-    
         new Thread(task).start();
     }
 
