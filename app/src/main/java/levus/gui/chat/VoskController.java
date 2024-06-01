@@ -26,9 +26,9 @@ public class VoskController {
     private TextField textField;
     private Button button;
     private ToggleButton toggleButton;
-    private String modelName  = "vosk-model-small-es-0.42";
-    private String modelDir = "Models";
-    private Model model;
+    private final String modelName  = "vosk-model-small-es-0.42";
+    private final String modelDir = "Models";
+    private final Model model;
     private Task<Void> listenTask;
     private Thread thread;
     private SendMessageFunction sendMessage;
@@ -41,7 +41,7 @@ public class VoskController {
         listenTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                
+
                 LibVosk.setLogLevel(LogLevel.DEBUG);
 
                 AudioFormat format = new AudioFormat(16000f, 16, 1, true, false);
@@ -78,7 +78,7 @@ public class VoskController {
                         JSONObject partialResult = new JSONObject(partialResultJson);
                         String response = partialResult.getString("partial");
                         changeText(response);
-                        
+
                     }
                 }
 
