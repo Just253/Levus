@@ -1,23 +1,46 @@
-from flask import Flask, request, jsonify
+from flask import jsonify, request, Blueprint
+from flask import current_app as app
+from ...tinydb_flask import TinyDB as TDB
+from tinydb import TinyDB, Query
 
-app = Flask(__name__)
+db: TinyDB = TDB(app).get_db()
 
-process_status = {}
+status_bp = Blueprint('status', __name__)
 
-@app.route('/status/<process_id>', methods=['GET'])
+@status_bp.route('/status/<process_id>', methods=['GET'])
 def get_status(process_id):
-    status = process_status.get(process_id)
+    process = db.Query()
+    status = db.search(process.process_id == process_id)
     if status:
-        return jsonify(status)
+        status = status[0]  # Get the first (and likely only) status
+        if status['status'] == 'completed':
+            return jsonify({
+                "state": status['status'],
+                "process_id": status['process_id'],
+                "response": status.get('response', '')
+            })
+        elif status['status'] == 'pending':
+            return jsonify({
+                "state": status['status'],
+                "process_id": status['process_id'],
+                "preview": status.get('preview', '')
+            })
+        elif status['status'] == 'error':
+            return jsonify({
+                "state": status['status'],
+                "process_id": status['process_id'],
+                "preview": status.get('preview', ''),
+                "error": status.get('error', '')
+            })
     else:
         return jsonify({"error": "Process ID not found"}), 404
 
-def update_process_status(process_id, status, response=None, error=None):
-    process_status[process_id] = {
-        "status": status,
-        "response": response,
-        "error": error
-    }
+def create_status(process_id):
+    db.insert({"process_id": process_id, "status": "pending", "preview": "", "response": "", "error": ""})
 
-if __name__ == '__main__':
-    app.run()
+def update_status( process_id, **kwargs):
+    query = Query()
+    process = db.search(query.process_id == process_id)
+    if process:
+        db.update(**kwargs, query.process_id == process_id)
+        return 200
