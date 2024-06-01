@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from dotenv import load_dotenv
 import os
 import importlib
-from tinydb_flask import TinyDB
+from api.functions.tinydb_flask import TinyDB
 
 load_dotenv()
 app = Flask(__name__)
@@ -22,7 +22,7 @@ for filename in os.listdir(routes_dir):
                     app.register_blueprint(attr)
         except Exception as e:
             print(f"Error al importar el módulo {filename}: {e}")
-            
+
 if __name__ == '__main__':
     print(app.url_map)
     app.run(debug=True, port=5000)
