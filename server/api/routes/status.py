@@ -1,14 +1,17 @@
 from flask import jsonify, request, Blueprint
 from flask import current_app as app
-from ...tinydb_flask import TinyDB as TDB
+from ..functions import TDB
 from tinydb import TinyDB, Query
-
-db: TinyDB = TDB(app).get_db()
 
 status_bp = Blueprint('status', __name__)
 
+def get_db():
+    db: TinyDB = TDB(app).get_db()
+    return db
+
 @status_bp.route('/status/<process_id>', methods=['GET'])
 def get_status(process_id):
+    db = get_db()
     process = db.Query()
     status = db.search(process.process_id == process_id)
     if status:
@@ -35,12 +38,13 @@ def get_status(process_id):
     else:
         return jsonify({"error": "Process ID not found"}), 404
 
-def create_status(process_id):
+def create_status(process_id: int):
+    db = get_db()
     db.insert({"process_id": process_id, "status": "pending", "preview": "", "response": "", "error": ""})
 
-def update_status( process_id, **kwargs):
+def update_status(process_id: int, **kwargs):
+    db = get_db()
     query = Query()
     process = db.search(query.process_id == process_id)
     if process:
-        db.update(**kwargs, query.process_id == process_id)
-        return 200
+        db.update(kwargs, query.process_id == process_id)
