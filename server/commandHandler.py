@@ -1,9 +1,41 @@
 import inspect
 import importlib, os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from api import TDB
+from tinydb import Query
+from tinydb.table import Table
+class dbCommands:
+  query = Query()
+  def __init__(self, app):
+    self.db: Table = TDB(app).get_db().table("commands")
+  def exists(self,commandName):
+    return len(self.db.search(self.query.name == commandName)) > 0
+  def addCommand(self,commandName,commandInfo):
+    if self.exists(commandName):
+      return False
+    self.db.insert({"name": commandName, "info": commandInfo})
+  def updateCommand(self,commandName,commandInfo):
+    self.db.update({"info": commandInfo}, self.query.name == commandName)
+  def removeCommand(self,commandName):
+    self.db.remove(self.query.name == commandName)
+  def getCommand(self, commandName):
+    result = self.db.search(self.query.name == commandName)
+    return result[0] if result else None
+  def getTool(self,commandName):
+    return self.getCommand(commandName)["info"]
+  def getCommands(self):
+    return self.db.all()
+  def getTools(self):
+    return [command["info"] for command in self.getCommands()]
+      
 class CommandHandler:
-  def __init__(self, commands_Path):
+  logging = False
+  def __init__(self, commands_Path,app):
     self.commands_Path = commands_Path
     self.commands = []
+    self.db = dbCommands(app)
+    self.make_tools()
 
   def get_method_info(self,method):
     docstring = inspect.getdoc(method)
@@ -44,41 +76,61 @@ class CommandHandler:
     return self.get_class_info(command_module)
   
   def getFiles(self):
-    command_files = os.listdir(self.commands_Path.replace('.',  os.sep))
-    command_files = [file[:-3] for file in command_files if file.endswith(".py")]
-    return command_files
+    return [file[:-3] for file in os.listdir(self.commands_Path.replace('.', os.sep)) if file.endswith(".py")]
   
   def make_tools(self):
     for command_file in self.getFiles():
        self.add_tool(command_file)
     return self.commands
   def add_tool(self, name_file):
-    index, tool = self.search_tool(name_file)
-    new_tool = {
-         "type": "function",
-         "function": self.get_info_from_name(name_file)
-      }
-    if tool:
-        self.commands[index] = new_tool
-    else:
-        self.commands.append(new_tool)
-    return True
+    try:
+      new_tool = {
+          "type": "function",
+          "function": self.get_info_from_name(name_file)
+        }
+      if self.db.exists(name_file):
+        self.db.updateCommand(name_file,new_tool)
+      else:
+        self.db.addCommand(name_file,new_tool)
+    except Exception as e:
+      if self.logging:
+        print(f"Error al agregar la herramienta {name_file}: {e}")
   def remove_tool(self, name):
-    index, tool = self.search_tool(name)
-    if tool:
-        self.commands.pop(index)
-        return True
-    return False
-  
-  def search_tool(self, name):
-    for i, command in enumerate(self.commands):
-        if command["function"]["name"] == name:
-            return i, command
-    return None, None
-  def get_tools(self):
-    return self.commands  
+    self.db.removeCommand(name)
       
-#class_info = get_class_info(BotCommand)
-#json_info = json.dumps(class_info, indent=4)
 
-#print(json_info)
+class CommandHandlerObserver(FileSystemEventHandler):
+  def __init__(self, file_path, app):
+    self.commandHandler = CommandHandler(file_path, app)
+    self.observer = Observer()
+    self.observer.schedule(self, self.commandHandler.commands_Path, recursive=True)
+    self.observer.start()
+
+  def getFileName(self, event):
+    filename = event.src_path.split(os.sep)[-1]
+    isPy = filename.endswith(".py")
+    return filename[:-3], isPy
+
+  def handle_event(self, event, action):
+    filename, isPy = self.getFileName(event)
+    if isPy:
+      action(filename)
+
+  def on_modified(self, event):
+    self.handle_event(event, self.commandHandler.add_tool)
+
+  def on_created(self, event):
+    self.handle_event(event, self.commandHandler.add_tool)
+
+  def on_deleted(self, event):
+    self.handle_event(event, self.commandHandler.remove_tool)
+
+  def on_moved(self, event):
+    def action(filename):
+      self.commandHandler.remove_tool(filename)
+      self.commandHandler.add_tool(filename)
+    self.handle_event(event, action)
+
+  def stop(self):
+    self.observer.stop()
+    self.observer.join()
