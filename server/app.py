@@ -2,12 +2,11 @@ from flask import Flask, Blueprint
 from dotenv import load_dotenv
 import os
 import importlib
-from api.functions.tinydb_flask import TinyDB
+from commandHandler import CommandHandlerObserver
 
 load_dotenv()
 app = Flask(__name__)
 app.config["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-#db = TinyDB(app).get_db()
 
 # Importar automáticamente todas las clases de los directorios de api/routes/
 
@@ -23,6 +22,8 @@ for filename in os.listdir(routes_dir):
         except Exception as e:
             print(f"Error al importar el módulo {filename}: {e}")
 
+observer = CommandHandlerObserver(os.path.join(os.path.dirname(__file__), 'commands'), app)
+observer.commandHandler.logging = True
 if __name__ == '__main__':
     print(app.url_map)
     app.run(debug=True, port=5000)
