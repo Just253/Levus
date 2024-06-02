@@ -33,5 +33,3 @@ Para iniciar el proyecto, simplemente ejecute el archivo `start.bash` en Linux o
 
 # Lista de Tareas
 ...
-
-"El proyecto Levus es un controlador de computadora basado en voz y gestos que utiliza bibliotecas para el reconocimiento de voz, texto a voz, reconocimiento de manos e inteligencia artificial de código abierto. El controlador puede ejecutar una variedad de comandos, como abrir aplicaciones según la configuración, crear comandos personalizados y más, todo con la ayuda de la IA. El proyecto utiliza tanto Python como Java, con Java para la interfaz gráfica de usuario (GUI) y Python para el servidor donde se administran los comandos, la conexión con la IA y el reconocimiento. La GUI de Java tiene como objetivo simplificar las cosas y hacerlas más fáciles de usar. Usando atlantaFX, flask, vosk, OPENAI con modelos gpt3 "
