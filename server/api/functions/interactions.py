@@ -2,7 +2,24 @@ from tenacity import retry, wait_random_exponential, stop_after_attempt
 from openai import OpenAI
 from flask import current_app as app
 from ..functions.db import statusTable
-
+from ...commandHandler import dbCommands
+default_tool = [{
+    "type": "function",
+    "function": {
+        "name": "get_info_tool",
+        "description": "Obtiene informacion de otro tool/function/comando",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tool": {
+                    "type": "string",
+                    "description": "Nombre del tool"
+                }
+            },
+            "required": ["tool"]
+        }
+    }
+}]
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
 def get_response_from_openai(messages, process_id, table: statusTable =None, tools=None, tool_choice=None, model="gpt-3.5-turbo"):
     client = OpenAI(api_key=app.config["OPENAI_API_KEY"])
@@ -16,6 +33,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
             messages=messages,
             temperature=0.2,
             stream=True,
+            tools=default_tool
         )
         chunk_messages = ""
         for chunk in response:
