@@ -20,6 +20,7 @@ default_tool = [{
         }
     }
 }]
+MAX_CALLS = 10
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
 def get_response_from_openai(messages, process_id, table: statusTable =None, tools=None, tool_choice=None, model="gpt-3.5-turbo"):
     client = OpenAI(api_key=app.config["OPENAI_API_KEY"])
@@ -42,6 +43,10 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
                 chunk_messages += message
                 if table:
                     table.update_status(process_id=process_id, preview=chunk_messages)
+        tools_calls = response.choices[0].message.tools_calls
+        if tools_calls:
+            # TODO: Implement tool calls
+            pass
         if table:
             table.update_status(process_id=process_id, status="completed", response=chunk_messages, preview="")
     except Exception as e:
