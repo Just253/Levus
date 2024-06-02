@@ -37,6 +37,7 @@ def get_status(process_id: int, name: str, app: Flask):
 
 class statusTable:
     table: Table
+    query = Query()
     def __init__(self, name: str, app: Flask):
         self.table = get_table(name, app)
     def get_table(self):
@@ -44,7 +45,6 @@ class statusTable:
     def create_status(self, process_id: int):
         self.table.insert({"process_id": process_id, "status": "pending", "preview": "", "response": "", "error": ""})
     def update_status(self, process_id: int, **kwargs):
-        query = Query()
-        process = self.table.search(query.process_id == process_id)
+        process = self.table.search(self.query.process_id == process_id)
         if process:
-            self.table.update(kwargs, query.process_id == process_id)
+            self.table.update(kwargs, self.query.process_id == process_id)
