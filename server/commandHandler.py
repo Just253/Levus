@@ -28,6 +28,10 @@ class dbCommands:
     return self.db.all()
   def getTools(self):
     return [command["info"] for command in self.getCommands()]
+  def getModuleFromName(self,commandName):
+    return importlib.import_module(f"commands.{commandName}")
+  def getCommandClass(self,commandName):
+    return getattr(self.getModuleFromName(commandName), "BotCommand") if self.exists(commandName) else None
       
 class CommandHandler:
   logging = False
