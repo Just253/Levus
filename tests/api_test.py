@@ -34,7 +34,7 @@ messages=[
       "content": [
         {
           "type": "text",
-          "text": "Quien es napoleon"
+          "text": "Abre youtube"
         }
       ]
     }
