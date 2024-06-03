@@ -42,10 +42,11 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         check_if_call_tool, tools_called = send_message_tools_to_openai(client, messages, tools, tool_choice, process_id, app, table)
         if check_if_call_tool:
             messages = messages + check_if_call_tool
+            if table: table.update_status(process_id=process_id, preview=f"Ejecutando {tools_called}\n...")
             responses_tools = send_message_tools_to_openai(client, messages, tools_called, tool_choice, process_id, app, table)
             if responses_tools:
                 messages = messages + responses_tools
-
+        
 
         response = client.chat.completions.create(
             model=model,
