@@ -21,6 +21,10 @@ default_tool = [{
                     "items": {
                         "type": "string"
                     }
+                },
+                "to_use":{
+                    "type": "boolean",
+                    "description": "Si es true se usaran los tools de el parametro tools, si es false solo se obtendra informacion de los tools mencionados",
                 }
             },
             "required": ["tool"]
@@ -103,7 +107,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         print(f"Unable to generate ChatCompletion response due to {error_type}")
         return str(e)
     
-def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_status, commandsDB: dbCommands):
+def send_message_tools_to_openai (client: OpenAI, messages,tools_calling,fun_update_status, commandsDB: dbCommands):
     fun_update_status(preview="Obteniendo herramientas\n...")
     print("DB Commands: ", commandsDB)
     response = None
@@ -112,7 +116,7 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_stat
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.3,
-            tools=default_tool if not tools else tools,
+            tools=default_tool if not tools_calling else tools_calling,
         )
         print(response)
     except Exception as e:
@@ -148,10 +152,16 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_stat
                 tool_parameters = json.loads(tool_call.function.arguments)
                 print("Tool parameters: ", tool_parameters)
                 if tool_name == "get_info_tool":
-                    tools = tool_parameters.get("tools")
-                    if tools:
-                        tools_to_call = commandsDB.get_tools_info(tools)
-                        tool_response_object["content"] = "Comandos obtenidos correctamente"
+                    tools_list = tool_parameters.get("tools")
+                    to_use = tool_parameters.get("to_use", True)
+                    
+                    if tools_list:
+                        tools_info = commandsDB.get_tools_info(tools_list)
+                        if to_use:
+                            tools_to_call = tools_info
+                            tool_response_object["content"] = "Comandos obtenidos correctamente"
+                        else:
+                            tool_response_object["content"] = ",".join([tool["name"] + " - " + tool["description"] for tool in tools_info]) 
                     else:
                         tool_response_object["content"] = "No se especificaron herramientas"
                 elif commandsDB.exists(tool_name):
