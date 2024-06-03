@@ -31,7 +31,7 @@ class dbCommands:
   def getModuleFromName(self,commandName):
     return importlib.import_module(f"commands.{commandName}")
   def getCommandClass(self,commandName):
-    return getattr(self.getModuleFromName(commandName), "BotCommand") if self.exists(commandName) else None
+    return getattr(self.getModuleFromName(commandName), "BotCommand")
       
 class CommandHandler:
   logging = False
