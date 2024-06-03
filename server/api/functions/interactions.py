@@ -6,7 +6,7 @@ from flask import current_app as app
 from ..functions.db import statusTable
 from ...commandHandler import dbCommands
 from commands.command import Command
-import json
+import json, openai
 default_tool = [{
     "type": "function",
     "function": {
@@ -38,14 +38,18 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     last_10_non_system_messages = non_system_messages[-9:]
     
     messages = [system_message] + last_10_non_system_messages
+    def update_status(**kwargs):
+        if table:
+            table.update_status(process_id=process_id, **kwargs)
     try:
         check_if_call_tool, tools_called = send_message_tools_to_openai(client, messages, tools, tool_choice, process_id, app, table)
         if check_if_call_tool:
             messages = messages + check_if_call_tool
+            update_status(process_id=process_id, preview=f"Ejecutando {tools_called}\n...")
             responses_tools = send_message_tools_to_openai(client, messages, tools_called, tool_choice, process_id, app, table)
             if responses_tools:
                 messages = messages + responses_tools
-
+        
 
         response = client.chat.completions.create(
             model=model,
@@ -59,15 +63,30 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
             message = chunk.choices[0].delta.content
             if message != None:
                 chunk_messages += message
-                if table:
-                    table.update_status(process_id=process_id, preview=chunk_messages)
-        if table:
-            table.update_status(process_id=process_id, status="completed", response=chunk_messages, preview="")
+                update_status(process_id=process_id, preview=chunk_messages)
+        update_status(process_id=process_id, status="completed", response=chunk_messages, preview="")
     except Exception as e:
-        if table:
-            table.update_status(process_id=process_id, status="error", error=str(e))
-        print("Unable to generate ChatCompletion response")
-        print(f"Exception: {e}")
+        error_type = type(e).__name__
+        error_message = str(e)
+        if isinstance(e, openai.error.Timeout):
+            error_info = "OpenAI API request timed out"
+        elif isinstance(e, openai.error.APIError):
+            error_info = "OpenAI API returned an API Error"
+        elif isinstance(e, openai.error.APIConnectionError):
+            error_info = "OpenAI API request failed to connect"
+        elif isinstance(e, openai.error.InvalidRequestError):
+            error_info = "OpenAI API request was invalid"
+        elif isinstance(e, openai.error.AuthenticationError):
+            error_info = "OpenAI API request was not authorized"
+        elif isinstance(e, openai.error.PermissionError):
+            error_info = "OpenAI API request was not permitted"
+        elif isinstance(e, openai.error.RateLimitError):
+            error_info = "OpenAI API request exceeded rate limit"
+        else:
+            error_info = "An unexpected error occurred"
+        
+        update_status(status="error", error=f"{error_info}: {error_message}")
+        print(f"Unable to generate ChatCompletion response due to {error_type}")
         return str(e)
     
 def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, process_id,app, table: statusTable = None):
@@ -113,7 +132,7 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, p
                 except Exception as e:
                     full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
                     tool_response = full_message[-100:]
-                    print(f"Error al ejecutar la herramienta {tool_name}: {e}")
+                    print(full_message)
                     tool_response_object["content"] = tool_response
                     calls += 1
                 responses.append(tool_response_object)
