@@ -113,7 +113,7 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, p
                 except Exception as e:
                     full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
                     tool_response = full_message[-100:]
-                    print(f"Error al ejecutar la herramienta {tool_name}: {e}")
+                    print(full_message)
                     tool_response_object["content"] = tool_response
                     calls += 1
                 responses.append(tool_response_object)
