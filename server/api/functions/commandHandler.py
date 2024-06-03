@@ -5,6 +5,7 @@ from watchdog.events import FileSystemEventHandler
 from . import TDB
 from tinydb import Query
 from tinydb.table import Table
+import sys
 class dbCommands:
   query = Query()
   def __init__(self, app):
@@ -31,7 +32,7 @@ class dbCommands:
   def getToolsNames(self):
     return [command["name"] for command in self.getCommands()]
   def getModuleFromName(self,commandName):
-    return importlib.import_module(f"commands.{commandName}")
+    return importlib.import_module(f"server.commands.{commandName}")
   def getCommandClass(self,commandName):
     return getattr(self.getModuleFromName(commandName), "BotCommand")
   def get_tools_info(self, tools):
