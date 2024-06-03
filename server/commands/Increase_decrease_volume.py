@@ -5,7 +5,11 @@ class BotCommand(Command):
     name="volume change"
     description="este comando modifica el volumen de la aplicacion que lo ejecuta"
     
-    def execute(self,nuevo_volumen):
+    def execute(self,nuevo_volumen:int):
+        """
+        :param nuevo_volumen: volumen ingresado por el usuario
+        :type nuevo_volumen: int
+        """
         #self.obtener_volumen()
         self.cambiar_volumen(nuevo_volumen)
 
