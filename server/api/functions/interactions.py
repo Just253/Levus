@@ -5,6 +5,7 @@ from typing import List
 from flask import current_app as app
 from ..functions.db import statusTable
 from ...commandHandler import dbCommands
+from commands.command import Command
 default_tool = [{
     "type": "function",
     "function": {
@@ -58,7 +59,8 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         print(f"Exception: {e}")
         return str(e)
     
-def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, process_id, table: statusTable = None):
+def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, process_id,app, table: statusTable = None):
+    commands = dbCommands(app)
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=tools,
@@ -71,7 +73,29 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools, tool_choice, p
         tools_calls: List[ChatCompletionMessageToolCall] = response.choices[0].message.tools_calls
         if tools_calls:
             for tool_call in tools_calls:
-                tool_call_id = tool_call.id
-                tool_call_function = tool_call.function
-                tool_call_type = tool_call_function.type
+                tool_id = tool_call.id
+                tool_name = tool_call.function.name
+                tool_parameters = eval(tool_call.function.arguments)
+                tool_response_object = {
+                    "role":"tool",
+                    "tool_call_id": tool_id,
+                    "name": tool_name,
+                    "content": ""
+                }
+                if commands.exists(tool_name):
+                    commandClass: Command = commands.getCommandClass(tool_name)
+                    commandClass = commandClass()
+                    try:
+                        tool_response = commandClass.execute(tool_parameters)
+                        if tool_response == None:
+                            tool_response = "Comando ejecutado correctamente pero no devolvio respuesta"
+                    except Exception as e:
+                        full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
+                        tool_response = full_message[-100:]
+                        print(f"Error al ejecutar la herramienta {tool_name}: {e}")
+                    tool_response_object["content"] = tool_response
+                    calls += 1
+                else:
+                    tool_response_object["content"] = f"Tool {tool_name} no encontrado en DB"
+                responses.append(tool_response_object)
     return None if not responses else responses
