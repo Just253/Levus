@@ -30,7 +30,7 @@ default_tool = [{
 
 MAX_CALLS = 10
 
-@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(3))
+@retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(2))
 def get_response_from_openai(messages, process_id, table: statusTable =None, tools=None, tool_choice=None, model="gpt-3.5-turbo"):
     client: OpenAI = OpenAI(api_key=app.config["OPENAI_API_KEY"])
     default_tool_name = default_tool[0]["function"]["name"]
@@ -39,7 +39,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     all_tools = commands.getToolsNames()
     print("All tools: ", all_tools)
     system_message = list(filter(lambda x: x['role'] == 'system', messages))[0]
-    system_message["content"][0]["text"] += f" Llama a herramienta {default_tool_name} solo si es necesario, sino no llames/ejecutes | Solo puedes usar estos tools {",".join(all_tools) } | Si no hay un tool que satisfaga no busques, solo responde segun conozcas"
+    system_message["content"][0]["text"] += f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {",".join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | "
     print(system_message)
     non_system_messages = list(filter(lambda x: x['role'] != 'system', messages))
     last_10_non_system_messages = non_system_messages[-5:]
@@ -52,12 +52,13 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     try:
         check_if_call_tool, tools_called = send_message_tools_to_openai(client, messages, default_tool, update_status, commands)
         print("Check if call tool: ", check_if_call_tool)
-        if check_if_call_tool != [] and tools_called != []:
+        if tools_called != []:
             print("Tools called: ", tools_called)
             update_status(preview="Se llamaron herramientas\n...")
             messages = messages + check_if_call_tool
             update_status(preview=f"Ejecutando {tools_called}\n...")
-            responses_tools = send_message_tools_to_openai(client, messages, tools_called, update_status, commands)
+            tools_called += default_tool
+            responses_tools, _ = send_message_tools_to_openai(client, messages, tools_called, update_status, commands)
             if responses_tools:
                 messages = messages + responses_tools
         else:
@@ -80,6 +81,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     except Exception as e:
         error_type = type(e).__name__
         error_message = str(e)
+        print(f"Error: {error_type} - {error_message}")
         if isinstance(e, openai.error.Timeout):
             error_info = "OpenAI API request timed out"
         elif isinstance(e, openai.error.APIError):
@@ -101,9 +103,9 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         print(f"Unable to generate ChatCompletion response due to {error_type}")
         return str(e)
     
-def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_status, commands: dbCommands):
+def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_status, commandsDB: dbCommands):
     fun_update_status(preview="Obteniendo herramientas\n...")
-    print("DB Commands: ", commands)
+    print("DB Commands: ", commandsDB)
     response = None
     try:
         response = client.chat.completions.create(
@@ -126,6 +128,11 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_stat
     print("Tools calls: ", tools_calls)
     print("Iniciando while")
     if tools_calls != None:
+        responses = [{
+            "role": "assistant",
+            "content": None,
+            "tool_calls": [{"id": t.id, "function": {"name": t.function.name, "arguments": t.function.arguments}, "type": "function"} for t in tools_calls]
+        }]
         tryes = 0
         for tool_call in tools_calls:
             if tryes >= MAX_CALLS:
@@ -135,20 +142,20 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_stat
             tool_response_object = {
                 "role":"tool",
                 "tool_call_id": tool_id,
-                "name": tool_name,
                 "content": ""
             }
             try:
                 tool_parameters = json.loads(tool_call.function.arguments)
+                print("Tool parameters: ", tool_parameters)
                 if tool_name == "get_info_tool":
                     tools = tool_parameters.get("tools")
                     if tools:
-                        tools_to_call = commands.get_tools_info(tools)
+                        tools_to_call = commandsDB.get_tools_info(tools)
                         tool_response_object["content"] = "Comandos obtenidos correctamente"
                     else:
                         tool_response_object["content"] = "No se especificaron herramientas"
-                elif commands.exists(tool_name):
-                    commandClass: Command = commands.getCommandClass(tool_name)
+                elif commandsDB.exists(tool_name):
+                    commandClass: Command = commandsDB.getCommandClass(tool_name)
                     commandClass = commandClass()
                     tool_response = commandClass.execute(**tool_parameters)
                     if tool_response == None:
@@ -162,5 +169,6 @@ def send_message_tools_to_openai (client: OpenAI, messages,tools,fun_update_stat
                 tool_response_object["content"] = tool_response
             tryes += 1
             responses.append(tool_response_object)
+    fun_update_status(preview="Fin del while\n...")
     print("End of tools calls")
     return responses, tools_to_call
