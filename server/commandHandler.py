@@ -32,6 +32,12 @@ class dbCommands:
     return importlib.import_module(f"commands.{commandName}")
   def getCommandClass(self,commandName):
     return getattr(self.getModuleFromName(commandName), "BotCommand")
+  def get_tools_info(self, tools):
+    tools_info = []
+    for tool in tools:
+        tool_info = self.getTool(tool)
+        tools_info.append(tool_info)
+    return tools_info
       
 class CommandHandler:
   logging = False
