@@ -1,0 +1,10 @@
+Flask==3.0.3
+Flask_Executor==1.0.0
+openai==1.30.5
+python-dotenv==1.0.1
+PyYAML==6.0.1
+PyYAML==6.0.1
+Requests==2.32.3
+tenacity==8.3.0
+tinydb==4.8.0
+watchdog==4.0.1
