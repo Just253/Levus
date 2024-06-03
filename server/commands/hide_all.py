@@ -1,4 +1,4 @@
-from command import Command
+from .command import Command
 import ctypes
 
 class BotCommand(Command):
