@@ -1,7 +1,7 @@
 import inspect
 import importlib, os
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import FileSystemEventHandler, FileMovedEvent
 from . import TDB
 from tinydb import Query
 from tinydb.table import Table
@@ -52,6 +52,8 @@ class CommandHandler:
 
   def get_method_info(self,method):
     docstring = inspect.getdoc(method)
+    if docstring is None:
+      return {}, []
     lines = docstring.split("\n")
 
     parameters = {}
@@ -89,7 +91,7 @@ class CommandHandler:
     return class_info 
   
   def get_info_from_name(self,name):
-    command_module = importlib.import_module(f"commands.{name}")
+    command_module = importlib.import_module(f"server.commands.{name}")
     command_module = getattr(command_module, "BotCommand")
     return self.get_class_info(command_module)
   
@@ -130,9 +132,14 @@ class CommandHandlerObserver(FileSystemEventHandler):
     return filename[:-3], isPy
 
   def handle_event(self, event, action):
-    filename, isPy = self.getFileName(event)
+    if isinstance(event, FileMovedEvent):
+      old_filename, _ = self.getFileName(event.src_path)
+      new_filename, isPy = self.getFileName(event.dest_path)
+    else:
+      old_filename = new_filename, isPy = self.getFileName(event)
+  
     if isPy:
-      action(filename)
+      action(old_filename, new_filename)
 
   def on_modified(self, event):
     self.handle_event(event, self.commandHandler.add_tool)
@@ -144,9 +151,9 @@ class CommandHandlerObserver(FileSystemEventHandler):
     self.handle_event(event, self.commandHandler.remove_tool)
 
   def on_moved(self, event):
-    def action(filename):
-      self.commandHandler.remove_tool(filename)
-      self.commandHandler.add_tool(filename)
+    def action(old_filename, new_filename):
+      self.commandHandler.remove_tool(old_filename)
+      self.commandHandler.add_tool(new_filename)
     self.handle_event(event, action)
 
   def stop(self):
