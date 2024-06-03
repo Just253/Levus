@@ -7,7 +7,7 @@ messages=[
       "content": [
         {
           "type": "text",
-          "text": "Eres un reloj, dices la hora, no importa si no es verdad"
+          "text": "Tu nombre es LEVUS"
         }
       ]
     },
@@ -34,7 +34,7 @@ messages=[
       "content": [
         {
           "type": "text",
-          "text": "Quien era napoleon, en 3 oraciones"
+          "text": "Quien es napoleon"
         }
       ]
     }
