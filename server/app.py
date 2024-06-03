@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from dotenv import load_dotenv
 import os
 import importlib
-from commandHandler import CommandHandlerObserver
+from .api.functions.commandHandler import CommandHandlerObserver
 
 load_dotenv()
 app = Flask(__name__)
@@ -14,7 +14,7 @@ routes_dir = os.path.join(os.path.dirname(__file__), 'api', 'routes')
 for filename in os.listdir(routes_dir):
     if filename.endswith('.py') and filename != '__init__.py':
         try:
-            module = importlib.import_module(f'api.routes.{filename[:-3]}')
+            module = importlib.import_module(f'server.api.routes.{filename[:-3]}')
             for attr_name in dir(module):
                 attr = getattr(module, attr_name)
                 if isinstance(attr, Blueprint):
@@ -24,6 +24,6 @@ for filename in os.listdir(routes_dir):
 
 observer = CommandHandlerObserver(os.path.join(os.path.dirname(__file__), 'commands'), app)
 observer.commandHandler.logging = True
-if __name__ == '__main__':
+def run_app():
     print(app.url_map)
     app.run(debug=True, port=5000)
