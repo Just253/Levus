@@ -7,8 +7,8 @@ class BotCommand(Command):
     
     def execute(self):
         # presionar tecla
-        'press windows key', ctypes.windll.user32.keybd_event(0x5B, 0, 0, 0)  # Tecla Windows abajo
-        'press D key',ctypes.windll.user32.keybd_event(0x44, 0, 0, 0)  # Tecla D abajo
+        ctypes.windll.user32.keybd_event(0x5B, 0, 0, 0)  # Tecla Windows abajo
+        ctypes.windll.user32.keybd_event(0x44, 0, 0, 0)  # Tecla D abajo
         # soltar tecla
-        'release D key',ctypes.windll.user32.keybd_event(0x44, 0, 2, 0)  # Tecla D arriba
-        'release windows key',ctypes.windll.user32.keybd_event(0x5B, 0, 2, 0)  # Tecla Windows arriba
+        ctypes.windll.user32.keybd_event(0x44, 0, 2, 0)  # Tecla D arriba
+        ctypes.windll.user32.keybd_event(0x5B, 0, 2, 0)  # Tecla Windows arriba
