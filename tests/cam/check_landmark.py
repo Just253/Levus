@@ -6,11 +6,12 @@ def load_landmarks(file_path='./tests/cam/landmarks.json'):
     with open(file_path, 'r') as f:
         return json.load(f)
 
-def compare_landmarks(landmarks1, landmarks2, tolerance=100):
+def compare_landmarks(landmarks1, landmarks2, tolerance=0.1):
     for l1, l2 in zip(landmarks1, landmarks2):
         if (abs(l1['x'] - l2['x']) > tolerance or
             abs(l1['y'] - l2['y']) > tolerance or
             abs(l1['z'] - l2['z']) > tolerance):
+            print(f"Diferencia encontrada: {(abs(l1['x'] - l2['x']), abs(l1['y'] - l2['y']), abs(l1['z'] - l2['z']))}")
             return False
     return True
 
