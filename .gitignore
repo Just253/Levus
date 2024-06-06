@@ -5,3 +5,4 @@ out/
 */Models/*
 !*/Models/.gitkeep
 flask.db
+landmarks.json
