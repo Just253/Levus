@@ -1,9 +1,8 @@
 import cv2
 import mediapipe as mp
 import json
-import math
 
-def load_landmarks(file_path='c:\\Users\\Hans\\Levus\\tests\\cam\\landmarks.json'):
+def load_landmarks(file_path='./tests/cam/landmarks.json'):
     with open(file_path, 'r') as f:
         return json.load(f)
 
@@ -45,10 +44,11 @@ while cap.isOpened():
             if compare_landmarks(current_landmarks, saved_landmarks):
                 print("Mano en la misma posición")
             else:
-                print("Mano en distinta posición")
+                pass
+                ##print("Mano en distinta posición")
 
     cv2.imshow('Hand Tracking', image)
-    if cv2.waitKey(5) & 0xFF == 27:
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()

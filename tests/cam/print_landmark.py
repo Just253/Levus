@@ -13,7 +13,7 @@ last_saved_time = time.time()
 while (cap.isOpened()):
     success, image = cap.read()
     if not success:
-        #print("Ignoring empty camera frame.")
+        print("Ignoring empty camera frame.")
         continue
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
