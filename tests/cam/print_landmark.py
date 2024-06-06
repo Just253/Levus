@@ -26,9 +26,9 @@ while (cap.isOpened()):
             for idx, landmark in enumerate(hand_landmarks.landmark):
                 print(f"Landmark {idx}: (X: {landmark.x}, Y: {landmark.y}, Z: {landmark.z})")
             current_time = time.time()
-            if current_time - last_saved_time >= 10: ## Define el tiempo de guardado
-                save(hand_landmarks, './cam/landmarks.json')
-                last_saved_time = current_time
+            if current_time - last_saved_time >= 10: 
+                save(hand_landmarks, './tests/cam/landmarks.json')
+                last_saved_time = current_time # Carita enojada carita enojada
 
     cv2.imshow('Hand Tracking', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):

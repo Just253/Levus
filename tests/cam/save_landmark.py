@@ -21,5 +21,7 @@ def save(hand_landmarks, filepath='landmarks.json'):
             })
         with open(filepath, 'w') as f:
             json.dump(landmarks, f)
+        print("### Landmarks ###")
         print(f"Landmarks saved to {filepath}")
+        print("#################")
         last_saved_time = current_time

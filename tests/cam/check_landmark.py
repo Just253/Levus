@@ -6,7 +6,7 @@ def load_landmarks(file_path='./tests/cam/landmarks.json'):
     with open(file_path, 'r') as f:
         return json.load(f)
 
-def compare_landmarks(landmarks1, landmarks2, tolerance=0.01):
+def compare_landmarks(landmarks1, landmarks2, tolerance=100):
     for l1, l2 in zip(landmarks1, landmarks2):
         if (abs(l1['x'] - l2['x']) > tolerance or
             abs(l1['y'] - l2['y']) > tolerance or
@@ -21,6 +21,7 @@ hands = mp_hands.Hands()
 mp_drawing = mp.solutions.drawing_utils
 
 cap = cv2.VideoCapture(0)
+filter_on = False
 
 while cap.isOpened():
     success, image = cap.read()
@@ -28,6 +29,7 @@ while cap.isOpened():
         print("Ignoring empty camera frame.")
         continue
 
+    original_image = image.copy()
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = hands.process(image)
 
@@ -40,12 +42,18 @@ while cap.isOpened():
                     'y': landmark.y,
                     'z': landmark.z
                 })
-
-            if compare_landmarks(current_landmarks, saved_landmarks):
+            if compare_landmarks(saved_landmarks, current_landmarks):
                 print("Mano en la misma posición")
+                filter_on = False
             else:
-                pass
-                ##print("Mano en distinta posición")
+                print("Mano en distinta posición")
+                filter_on = True
+
+    if filter_on:
+        # Aplica el filtro a la imagen
+        pass
+    else:
+        image = original_image
 
     cv2.imshow('Hand Tracking', image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
