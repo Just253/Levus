@@ -7,13 +7,13 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands()
 mp_drawing = mp.solutions.drawing_utils
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 last_saved_time = time.time()
 
-while cap.isOpened():
+while (cap.isOpened()):
     success, image = cap.read()
     if not success:
-        print("Ignoring empty camera frame.")
+        #print("Ignoring empty camera frame.")
         continue
 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
