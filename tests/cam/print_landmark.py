@@ -31,7 +31,7 @@ while (cap.isOpened()):
                 last_saved_time = current_time
 
     cv2.imshow('Hand Tracking', image)
-    if cv2.waitKey(5) & 0xFF == 27:
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
