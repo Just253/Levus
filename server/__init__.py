@@ -3,7 +3,7 @@ from flask_socketio import SocketIO
 from dotenv import load_dotenv
 import os
 import importlib
-from .api.functions.commandHandler import CommandHandlerObserver
+from .functions.commandHandler import CommandHandlerObserver
 
 load_dotenv()
 socketio = SocketIO()

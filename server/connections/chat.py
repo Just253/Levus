@@ -1,8 +1,8 @@
 from flask import jsonify
 from flask import current_app as app
 from flask_executor import Executor
-from ..api.functions.interactions import get_response_from_openai
-from ..api.functions.db import statusTable
+from ..functions.interactions import get_response_from_openai
+from ..functions.db import statusTable
 from .. import socketio
 from flask_socketio import emit
 import uuid
