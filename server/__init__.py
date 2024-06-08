@@ -27,8 +27,6 @@ def create_app(debug=False):
 
     observer = CommandHandlerObserver(os.path.join(os.path.dirname(__file__), 'commands'), app)
     observer.commandHandler.logging = True
-
-    print(app.url_map)
     socketio.init_app(app)
     return app
     
