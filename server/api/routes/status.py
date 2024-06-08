@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint
 from flask import current_app as app
-from ..functions.db import get_status as get_status_fn
+from ...functions.db import get_status as get_status_fn
 
 status_bp = Blueprint('status', __name__)
 

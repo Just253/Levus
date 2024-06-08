@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask import current_app as app
 from flask_executor import Executor
-from ..functions.interactions import get_response_from_openai
-from ..functions.db import statusTable
+from ...functions.interactions import get_response_from_openai
+from ...functions.db import statusTable
 import uuid
 
 chat_bp = Blueprint('chat', __name__)
