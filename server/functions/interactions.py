@@ -3,9 +3,9 @@ from openai import OpenAI
 from openai.types.chat.chat_completion_message import ChatCompletionMessageToolCall
 from typing import List
 from flask import current_app as app
-from ..functions.db import statusTable
+from .db import statusTable
 from .commandHandler import dbCommands
-from ...commands.command import Command
+from ..commands.command import Command
 import json, openai
 default_tool = [{
     "type": "function",

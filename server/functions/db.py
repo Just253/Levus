@@ -1,5 +1,5 @@
 from flask import Flask
-from ..functions import TDB
+from . import TDB
 from tinydb import TinyDB, Query
 from tinydb.table import Table
 
