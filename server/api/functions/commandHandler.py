@@ -132,6 +132,7 @@ class CommandHandlerObserver(FileSystemEventHandler):
     return filename[:-3], isPy
 
   def handle_event(self, event, action):
+    # TODO: check and fix this
     if isinstance(event, FileMovedEvent):
       old_filename, _ = self.getFileName(event.src_path)
       new_filename, isPy = self.getFileName(event.dest_path)
