@@ -66,6 +66,10 @@ def disconnect():
 def on_response(data):
     print('response received with ', data)
 
+@sio.on('chunks')
+def on_chunks(data):
+    print(data, end="")
+
 try:
     sio.connect('http://localhost:5000')
     sio.wait()

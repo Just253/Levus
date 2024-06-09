@@ -106,6 +106,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
               if hasattr(delta, "content"):
                   content = delta.content
                   if content:
+                      emit('chunks', content)
                       streaming_content += content        
     except Exception as e:
         text = f"Error chunks: {e}"
