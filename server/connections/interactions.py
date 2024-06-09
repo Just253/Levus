@@ -7,6 +7,7 @@ from ..functions.db import statusTable
 from ..functions.commandHandler import dbCommands
 from ..commands.command import Command
 import json
+from flask_socketio import emit
 default_tool = [{
     "type": "function",
     "function": {
@@ -127,7 +128,8 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                 try:
                     tool_parameters = json.loads(tool.function.arguments)
                 except Exception as e:
-                    tool_body_response["content"] = f"Error al obtener parametros de la herramienta {tool_name}: {e}"
+                    error_message = f"Error al obtener parametros de la herramienta {tool_name}: {e}"
+                    tool_body_response["content"] = error_message[:100]
                     tools_responses.append(tool_body_response)
                     continue
                 try:
@@ -149,7 +151,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                             commandClass = commandClass()
                             tool_response = commandClass.execute(**tool_parameters)
                             if tool_response == None:
-                                tool_response = "Comando ejecutado correctamente pero no devolvio respuesta"
+                                tool_response = "Ejecutado correctamente sin respuesta"
                         else:
                             tool_body_response["content"] = f"Tool {tool_name} no encontrado en DB"
                 except Exception as e:
