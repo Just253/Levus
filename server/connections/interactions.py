@@ -80,6 +80,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
         }
         tool_calls: List[ChatCompletionMessageToolCall] = []
         tools_responses = []
+        current_tool_call = None
 
         response = client.chat.completions.create(
             model=model,
@@ -96,24 +97,26 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
 
     try:
       streaming_content = ""
-      body_response["content"]["text"] = streaming_content
       for chunk in response:
           msg = chunk.choices[0]
+          print(msg)
           if hasattr(msg, "delta") and msg.delta:
-              delta = msg.delta
-              if hasattr(delta, "finish_reason"):
-                  finish_reason = delta.finish_reason
-                  if finish_reason is not None:
+            delta = msg.delta
+            if hasattr(delta, "finish_reason"):
+                finish_reason = delta.finish_reason
+                if finish_reason is not None:
                     if finish_reason == "tool_calls":
-                        tool_calls += delta.tool_calls
-                        print("Tool calls: ", delta.tool_calls)
+                        print("Tool calls: ", delta.tool_calls , " - ", len(delta.tool_calls))
+                        print("Tool calls: ", tool_calls)
                     break
-              if hasattr(delta, "content"):
-                  content = delta.content
-                  if content:
-                      emit('chunks', content)
-                      streaming_content += content
-                      body_response["content"]["text"] = streaming_content        
+            if hasattr(delta, "content"):
+                content = delta.content
+                if content:
+                    emit('chunks', content)
+                    streaming_content += content
+                    body_response["content"]["text"] = streaming_content 
+            
+                       
     except Exception as e:
         text = f"Error chunks: {e}"
         print(text)
