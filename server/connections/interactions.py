@@ -55,7 +55,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
             table.update_status(process_id=process_id, **kwargs)
     update_status(preview="...")
     try:
-        messages = get_responses(client, messages, model, commands, tools)
+        messages = get_responses(client, messages, model, commands)
         print(messages)
         last_content = messages[-1]["content"]
         update_status(status="completed", response=last_content, preview="")
@@ -69,10 +69,14 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         return str(e)
 
 def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=default_tool) -> list[dict]:
+    print("Messages: ", messages)
     try:
         body_response = {
             "role": "assistant",
-            "content": None,
+            "content": {
+                "type": "text",
+                "text": "..."
+            },
         }
         tool_calls: List[ChatCompletionMessageToolCall] = []
         tools_responses = []
@@ -92,7 +96,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
 
     try:
       streaming_content = ""
-      body_response["content"] = streaming_content
+      body_response["content"]["text"] = streaming_content
       for chunk in response:
           msg = chunk.choices[0]
           if hasattr(msg, "delta") and msg.delta:
@@ -102,21 +106,25 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                   if finish_reason is not None:
                     if finish_reason == "tool_calls":
                         tool_calls += delta.tool_calls
+                        print("Tool calls: ", delta.tool_calls)
                     break
               if hasattr(delta, "content"):
                   content = delta.content
                   if content:
                       emit('chunks', content)
-                      streaming_content += content        
+                      streaming_content += content
+                      body_response["content"]["text"] = streaming_content        
     except Exception as e:
         text = f"Error chunks: {e}"
         print(text)
         body_response["content"] = text[:100]
         return [body_response]
     new_messages = [body_response]
+    print(response)
     try:
         tool_calls = tool_calls[:MAX_CALLS]
         if tool_calls:
+            print("Tool calls: ", tool_calls)
             body_response["tool_calls"] = [{"id": t.id, "function": {"name": t.function.name, "arguments": t.function.arguments}, "type": "function"} for t in tool_calls]
 
             for tool in tool_calls:
@@ -166,7 +174,8 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
         print(text)
         body_response["content"] = text[:100]
     try:
-        final_response = get_responses(client, messages + new_messages, model, commandsDB, tools)
+        final_response = []
+        #final_response = get_responses(client, messages + new_messages, model, commandsDB, tools)
     except Exception as e:
         text = f"Error al realizar llamadas recursivas: {e}"
         print(text)
