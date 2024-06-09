@@ -115,7 +115,11 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                     emit('chunks', content)
                     streaming_content += content
                     body_response["content"]["text"] = streaming_content 
-            
+            if hasattr(delta, "tool_calls"):
+                for tool_call in delta.tool_calls:
+                    if tool_call.id not in [t.id for t in tool_calls]:
+                        # TODO: CHECK AND FIX HANDLING TOOLS
+                        pass
                        
     except Exception as e:
         text = f"Error chunks: {e}"
