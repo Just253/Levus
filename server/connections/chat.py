@@ -24,7 +24,7 @@ def chat(data):
   process_id = str(uuid.uuid4())
   table = statusTable("processes", app)
   table.create_status(process_id)
-  emit('response', {'process_id': process_id})
+  emit('response_id', {'process_id': process_id})
 
   executor = Executor(app)
   try:
