@@ -90,6 +90,67 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
         print(f"Unable to generate ChatCompletion response due to {error_type}")
         return str(e)
 
+def handle_tool_calls(delta, tool_calls, current_tool_call):
+    if delta.tool_calls:
+        print("delta.tool_calls: ", delta.tool_calls)
+        for tool_call in delta.tool_calls:
+            if hasattr(tool_call, "id"):
+                id = tool_call.id
+                if id: 
+                    print("Tool call id: ", id)
+                    if current_tool_call:
+                        tool_calls.append(current_tool_call)
+                    current_tool_call = toolBody()
+                    copy_id = f"{id}"
+                    current_tool_call.id = copy_id
+                    print("Tool vars: ", vars(current_tool_call))
+                    
+            if hasattr(tool_call, "function"):
+                if hasattr(tool_call.function, "name"):
+                    name = tool_call.function.name
+                    if name: current_tool_call.function.name += name
+                if hasattr(tool_call.function, "arguments"):
+                    arguments = tool_call.function.arguments
+                    if arguments != None:
+                        current_tool_call.function.arguments += arguments
+    return tool_calls, current_tool_call
+def handle_tool_execution(tool, commandsDB):
+    tool_body_response_content = ""
+    tool_name = tool.function.name
+    try:
+        tool_parameters = json.loads(tool.function.arguments)
+    except Exception as e:
+        error_message = f"Error al obtener parametros de la herramienta {tool_name}: {e}"
+        tool_body_response_content = error_message[:100]
+        return tool_body_response_content
+
+    try:
+        if tool_name == "get_info_tool":
+            tools_list = tool_parameters.get("tools")
+            only_desc = tool_parameters.get("only_desc", False)
+            if tools_list:
+                tools_info = commandsDB.get_tools_info(tools_list)
+                if only_desc:
+                    tool_body_response_content = ",".join([tool["name"] + " - " + tool["description"] for tool in tools_info]) 
+                else:
+                    tools = default_tool + tools_info
+                    tool_body_response_content = "Comandos obtenidos correctamente"         
+            else:
+                tool_body_response_content = "No se especificaron herramientas"
+        else:
+            if commandsDB.exists(tool_name):
+                commandClass: Command = commandsDB.getCommandClass(tool_name)
+                commandClass = commandClass()
+                tool_body_response_content = commandClass.execute(**tool_parameters)
+                if tool_body_response_content == None:
+                    tool_body_response_content = "Ejecutado correctamente sin respuesta"
+            else:
+                tool_body_response_content = f"Tool {tool_name} no encontrado en DB"
+    except Exception as e:
+        full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
+        print(full_message)
+        tool_body_response_content = full_message[-100:]
+    return tool_body_response_content
 class toolFunction:
     name: str = ""
     arguments: str = ""
@@ -146,27 +207,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                     streaming_content += content
                     body_response_text = streaming_content 
             if delta.tool_calls:
-                print("delta.tool_calls: ", delta.tool_calls)
-                for tool_call in delta.tool_calls:
-                    if hasattr(tool_call, "id"):
-                        id = tool_call.id
-                        if id: 
-                            print("Tool call id: ", id)
-                            if current_tool_call:
-                                tool_calls.append(current_tool_call)
-                            current_tool_call = toolBody()
-                            copy_id = f"{id}"
-                            current_tool_call.id = copy_id
-                            print("Tool vars: ", vars(current_tool_call))
-                            
-                    if hasattr(tool_call, "function"):
-                        if hasattr(tool_call.function, "name"):
-                            name = tool_call.function.name
-                            if name: current_tool_call.function.name += name
-                        if hasattr(tool_call.function, "arguments"):
-                            arguments = tool_call.function.arguments
-                            if arguments != None:
-                                current_tool_call.function.arguments += arguments
+                tool_calls, current_tool_call = handle_tool_calls(delta, tool_calls, current_tool_call)
         if current_tool_call:
             tool_calls.append(current_tool_call)            
     except Exception as e:
@@ -182,7 +223,6 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
             print("Tool calls: ", tool_calls)
             body_response["tool_calls"] = [{"id": t.id, "function": {"name": t.function.name, "arguments": t.function.arguments}, "type": "function"} for t in tool_calls]
             
-
             for tool in tool_calls:
                 tool_body_response = {
                     "role": "tool",
@@ -190,42 +230,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                     "tool_call_id": tool.id,
                     "name" : tool.function.name
                 }
-                tool_body_response_content = ""
-                tool_name = tool.function.name
-                try:
-                    tool_parameters = json.loads(tool.function.arguments)
-                except Exception as e:
-                    error_message = f"Error al obtener parametros de la herramienta {tool_name}: {e}"
-                    tool_body_response_content = error_message[:100]
-                    tool_body_response["content"] = tool_body_response_content
-                    tools_responses.append(tool_body_response)
-                    continue
-                try:
-                    if tool_name == "get_info_tool":
-                        tools_list = tool_parameters.get("tools")
-                        only_desc = tool_parameters.get("only_desc", False)
-                        if tools_list:
-                            tools_info = commandsDB.get_tools_info(tools_list)
-                            if only_desc:
-                                tool_body_response_content = ",".join([tool["name"] + " - " + tool["description"] for tool in tools_info]) 
-                            else:
-                                tools = default_tool + tools_info
-                                tool_body_response_content = "Comandos obtenidos correctamente"         
-                        else:
-                            tool_body_response_content = "No se especificaron herramientas"
-                    else:
-                        if commandsDB.exists(tool_name):
-                            commandClass: Command = commandsDB.getCommandClass(tool_name)
-                            commandClass = commandClass()
-                            tool_body_response_content = commandClass.execute(**tool_parameters)
-                            if tool_body_response_content == None:
-                                tool_body_response_content = "Ejecutado correctamente sin respuesta"
-                        else:
-                            tool_body_response_content = f"Tool {tool_name} no encontrado en DB"
-                except Exception as e:
-                    full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
-                    print(full_message)
-                    tool_body_response_content = full_message[-100:]
+                tool_body_response_content = handle_tool_execution(tool, commandsDB)
                 tool_body_response["content"] = tool_body_response_content
                 tools_responses.append(tool_body_response)
     except Exception as e:
