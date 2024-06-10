@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.socket.client.Socket;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -54,6 +55,7 @@ public class ChatController {
     private final VoskController voskController = new VoskController();
     private JSONArray messages;
     private Stage primaryStage;
+    private Socket socket;
 
     String config_file = "config.json";
 
@@ -144,7 +146,7 @@ public class ChatController {
 
     public void sendMessage(){
         String text = inputTxt.getText();
-        if (text.isEmpty()) {
+        if (text.isEmpty() || text.isBlank()) {
             return;
         }
         JSONObject message = new JSONObject();
@@ -156,9 +158,13 @@ public class ChatController {
         addMessage(message);
         Platform.runLater(() -> {
             chatBox.setVvalue(1.0);
-        }); 
-        askAssistant();
+        });
 
+        String model = "gpt-3.5-turbo-0125";
+        JSONObject data = new JSONObject();
+        data.put("model", model);
+        data.put("messages", messages);
+        this.socket.emit("new_message", data);
     }
 
     public void askAssistant() {
@@ -235,5 +241,13 @@ public class ChatController {
 
     public JSONArray getMessages() {
         return messages;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }
