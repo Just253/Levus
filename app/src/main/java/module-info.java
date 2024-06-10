@@ -14,7 +14,8 @@ module levus.gui {
     requires java.net.http;
     requires vosk;
     requires java.desktop;
-
+    requires socket.io.client;
+    requires engine.io.client;
     opens levus.gui to javafx.fxml;
     opens levus.gui.chat to javafx.fxml;
     opens levus.gui.titleBar to javafx.fxml;
