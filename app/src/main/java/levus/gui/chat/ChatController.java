@@ -80,12 +80,16 @@ public class ChatController {
         }
     }
     public Label makeLabel(String text, String role) {
+        return makeLabel(text, role, "");
+    }
+    public Label makeLabel(String text, String role, String ProcessId) {
         Label label = new Label();
         label.setMaxWidth(chatHistory.getWidth() * 0.9);
         label.setMaxHeight(Double.MAX_VALUE);
         label.setWrapText(true);
         label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
         label.setText(text);
+        label.setId(ProcessId);
 
         chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
             label.setMaxWidth(newValue.doubleValue() * 0.9);
