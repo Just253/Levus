@@ -9,7 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Chat {
-    private Socket_manager socket_manager;
+    private final Socket_manager socket_manager;
     private Socket socket;
     public Chat(Socket_manager socket_manager) {
         this.socket_manager = socket_manager;
@@ -33,7 +33,12 @@ public class Chat {
             Stage stage = socket_manager.getStage();
             // element with id process_id
             Label label = (Label) stage.getScene().lookup("#" + process_id);
+
             Platform.runLater(() -> {
+                if (label == null) {
+                    ChatController chatController = socket_manager.getChatController();
+                    chatController.makeLabel(content, "assistant", process_id);
+                }
                 label.setText(content);
             });
         });
@@ -44,17 +49,21 @@ public class Chat {
             String process_id = data.getString("process_id");
             JSONArray new_messages = data.getJSONArray("messages");
             JSONArray messages = chatController.getMessages();
-            // Buscar la posicion del process_id en el array de mensajes y agregrar los mensajes
-            for (int i = 0; i < messages.length(); i++) {
-                JSONObject message = messages.getJSONObject(i);
-                if (message.getString("process_id").equals(process_id)) {
-                    for (int j = 0; j < new_messages.length(); j++) {
-                        messages.getJSONObject(i).getJSONArray("messages").put(new_messages.getJSONObject(j));
-                    }
-                    break;
-                }
+            // add new messages to the existing messages
+            for (int i = 0; i < new_messages.length(); i++) {
+                messages.put(new_messages.getJSONObject(i));
             }
             chatController.setMessages(messages);
+        });
+
+        socket.on("response_id", args -> {
+            JSONObject data = (JSONObject) args[0];
+            String process_id = data.getString("process_id");
+            ChatController chatController = socket_manager.getChatController();
+            Platform.runLater(() -> {
+                chatController.makeLabel("...", "assistant", process_id);
+            });
+
         });
     }
 }
