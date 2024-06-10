@@ -34,22 +34,44 @@ default_tool = [{
 }]
 
 MAX_CALLS = 5
+system_message_content: str = ""
+def get_system_message():
+    return {
+        "role": "system",
+        "content": [{
+            "type": "text",
+            "text": system_message_content
+        }]
+    }
+def has_system_message(messages: list[dict]) -> bool:
+    return any([msg["role"] == "system" for msg in messages])
 
 @retry(wait=wait_random_exponential(multiplier=1, max=40), stop=stop_after_attempt(2))
 def get_response_from_openai(messages, process_id, table: statusTable =None, tools=None, tool_choice=None, model="gpt-3.5-turbo"):
+    global system_message_content
     client: OpenAI = OpenAI(api_key=app.config["OPENAI_API_KEY"])
     default_tool_name = default_tool[0]["function"]["name"]
     
     commands = dbCommands(app)
     all_tools = commands.getToolsNames()
     print("All tools: ", all_tools)
-    system_message = list(filter(lambda x: x['role'] == 'system', messages))[0]
-    system_message["content"][0]["text"] += f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {",".join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | "
-    print(system_message)
+    import traceback
+    try:
+        system_message = list(filter(lambda x: x['role'] == 'system', messages))
+        system_message_content = f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {",".join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | "
+        if system_message:
+            system_message = system_message[0]
+            system_message_content = system_message["content"][0]["text"] + system_message_content
+            system_message["content"][0]["text"] = system_message_content
+            system_message = [system_message]
+    except Exception as e:
+        print(f"Error al obtener mensaje del sistema: {e}")
+        system_message = [get_system_message()]
+        traceback.print_exc()
+    
     non_system_messages = list(filter(lambda x: x['role'] != 'system', messages))
     last_10_non_system_messages = non_system_messages[-5:]
-    
-    messages = [system_message] + last_10_non_system_messages
+    messages = system_message + last_10_non_system_messages
     def update_status(**kwargs):
         if table:
             table.update_status(process_id=process_id, **kwargs)
@@ -73,18 +95,20 @@ class toolFunction:
     arguments: str = ""
 class toolBody:
     id: str = ""
-    function: toolFunction = toolFunction()   
-
+    function: toolFunction
+    def __init__(self):
+        self.function = toolFunction()   
 def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=default_tool) -> list[dict]:
     print("Messages: ", messages)
     try:
         body_response = {
             "role": "assistant",
-            "content": {
+            "content": [{
                 "type": "text",
                 "text": "..."
-            },
+            }],
         }
+        body_response_text = body_response["content"][0]["text"]
         tool_calls: List[toolBody] = []
         tools_responses = []
         current_tool_call: toolBody = None
@@ -97,16 +121,16 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
             stream=True,
         )
     except Exception as e:
-      text = f"Error al obtener respuesta de OpenAI: {e}"
-      print(text)
-      body_response["content"]["text"] = text[:100]
-      return [body_response]
+        text = f"Error al obtener respuesta de OpenAI: {e}"
+        print(text)
+        body_response_text = text[:100]
+        return [body_response]
 
     try:
-      streaming_content = ""
-      for chunk in response:
+        streaming_content = ""
+        for chunk in response:
           msg = chunk.choices[0]
-          print(msg)
+          #print(msg)
           if hasattr(msg, "delta") and msg.delta:
             delta = msg.delta
             if hasattr(delta, "finish_reason"):
@@ -120,32 +144,35 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                 if content:
                     emit('chunks', content)
                     streaming_content += content
-                    body_response["content"]["text"] = streaming_content 
+                    body_response_text = streaming_content 
             if delta.tool_calls:
-                if len(tool_calls) < len(delta.tool_calls):
-                    tool_calls += [toolBody() for _ in range(len(delta.tool_calls) - len(tool_calls))]
+                print("delta.tool_calls: ", delta.tool_calls)
                 for tool_call in delta.tool_calls:
-                    index = tool_call.index
                     if hasattr(tool_call, "id"):
                         id = tool_call.id
                         if id: 
                             print("Tool call id: ", id)
+                            if current_tool_call:
+                                tool_calls.append(current_tool_call)
+                            current_tool_call = toolBody()
                             copy_id = f"{id}"
-                            tool_calls[index].id = copy_id
-                            print("Tool vars: ", vars(tool_calls[index]))
+                            current_tool_call.id = copy_id
+                            print("Tool vars: ", vars(current_tool_call))
                             
                     if hasattr(tool_call, "function"):
                         if hasattr(tool_call.function, "name"):
                             name = tool_call.function.name
-                            if name: tool_calls[index].function.name += name
+                            if name: current_tool_call.function.name += name
                         if hasattr(tool_call.function, "arguments"):
                             arguments = tool_call.function.arguments
                             if arguments != None:
-                                tool_calls[index].function.arguments += arguments            
+                                current_tool_call.function.arguments += arguments
+        if current_tool_call:
+            tool_calls.append(current_tool_call)            
     except Exception as e:
         text = f"Error chunks: {e}"
         print(text)
-        body_response["content"]["text"] = text[:100]
+        body_response_text = text[:100]
         return [body_response]
     new_messages = [body_response]
     print(response)
@@ -159,18 +186,18 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
             for tool in tool_calls:
                 tool_body_response = {
                     "role": "tool",
-                    "content": {
-                        "type": "text",
-                        "text": ""
-                    },
+                    "content": "",
                     "tool_call_id": tool.id,
+                    "name" : tool.function.name
                 }
+                tool_body_response_content = ""
                 tool_name = tool.function.name
                 try:
                     tool_parameters = json.loads(tool.function.arguments)
                 except Exception as e:
                     error_message = f"Error al obtener parametros de la herramienta {tool_name}: {e}"
-                    tool_body_response["content"]["text"] = error_message[:100]
+                    tool_body_response_content = error_message[:100]
+                    tool_body_response["content"] = tool_body_response_content
                     tools_responses.append(tool_body_response)
                     continue
                 try:
@@ -180,37 +207,45 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
                         if tools_list:
                             tools_info = commandsDB.get_tools_info(tools_list)
                             if only_desc:
-                                tool_body_response["content"]["text"] = ",".join([tool["name"] + " - " + tool["description"] for tool in tools_info]) 
+                                tool_body_response_content = ",".join([tool["name"] + " - " + tool["description"] for tool in tools_info]) 
                             else:
                                 tools = default_tool + tools_info
-                                tool_body_response["content"]["text"] = "Comandos obtenidos correctamente"         
+                                tool_body_response_content = "Comandos obtenidos correctamente"         
                         else:
-                            tool_body_response["content"]["text"] = "No se especificaron herramientas"
+                            tool_body_response_content = "No se especificaron herramientas"
                     else:
                         if commandsDB.exists(tool_name):
                             commandClass: Command = commandsDB.getCommandClass(tool_name)
                             commandClass = commandClass()
-                            tool_response = commandClass.execute(**tool_parameters)
-                            if tool_response == None:
-                                tool_response = "Ejecutado correctamente sin respuesta"
+                            tool_body_response_content = commandClass.execute(**tool_parameters)
+                            if tool_body_response_content == None:
+                                tool_body_response_content = "Ejecutado correctamente sin respuesta"
                         else:
-                            tool_body_response["content"]["text"] = f"Tool {tool_name} no encontrado en DB"
+                            tool_body_response_content = f"Tool {tool_name} no encontrado en DB"
                 except Exception as e:
                     full_message = f"Error al ejecutar la herramienta {tool_name}: {e}"
-                    tool_response = full_message[-100:]
                     print(full_message)
-                    tool_body_response["content"]["text"] = tool_response
-                new_messages.append(tool_body_response)
+                    tool_body_response_content = full_message[-100:]
+                tool_body_response["content"] = tool_body_response_content
+                tools_responses.append(tool_body_response)
     except Exception as e:
         text = f"Error al ejecutar comandos: {e}"
         print(text)
-        body_response["content"]["text"] = text[:100]
+        body_response_text = text[:100]
     try:
+        messages = messages[-5:]
+        if not has_system_message(messages):
+            messages = [get_system_message()] + messages
+        # si la respuesta de todos los tools son "Ejecutado correctamente sin respuesta" entonces no se envia final_response
         final_response = []
-        #final_response = get_responses(client, messages + new_messages, model, commandsDB, tools)
+        new_messages += tools_responses
+        if not all([tool["content"] == "Ejecutado correctamente sin respuesta" for tool in tools_responses]) or any([tool["name"] == "get_info_tool" for tool in tools_responses]):
+            final_response = get_responses(client, messages + new_messages, model, commandsDB, tools)
+        else:
+            body_response_text = "Comandos ejecutados correctamente"
     except Exception as e:
         text = f"Error al realizar llamadas recursivas: {e}"
         print(text)
-        body_response["content"]["text"] = text[:100]    
+        body_response_text = text[:100]    
 
     return new_messages + final_response
