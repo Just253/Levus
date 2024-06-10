@@ -32,6 +32,7 @@ public class App extends Application {
         ChatController controller = fxmlLoader.getController();
         controller.setPrimaryStage(stage);
 
+        stage.setUserData(controller);
         scene.setFill(Color.TRANSPARENT);
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setTitle("Levus");
