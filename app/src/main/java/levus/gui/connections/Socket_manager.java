@@ -5,6 +5,7 @@ import javafx.stage.Stage;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import levus.gui.chat.ChatController;
 
 import java.io.IOException;
 
@@ -13,7 +14,7 @@ public class Socket_manager {
     private String host;
     private int port;
     private Stage stage;
-    private Chat chat;
+
     public Socket_manager(String host, int port) {
         this.host = host;
         this.port = port;
@@ -34,7 +35,7 @@ public class Socket_manager {
                         System.out.println("Disconnected!");
                     }
                 });
-                chat = new Chat(this);
+                Chat chat = new Chat(this);
                 socket.connect();
                 break; // Si la conexión es exitosa, salimos del bucle
             } catch (Exception e) {
@@ -60,5 +61,13 @@ public class Socket_manager {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public ChatController getChatController() {
+        return (ChatController) stage.getScene().getUserData();
     }
 }
