@@ -1,5 +1,7 @@
 package levus.gui.connections;
 
+import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -7,13 +9,13 @@ public class Socket_manager {
     private Socket socket;
     private String host;
     private int port;
-
+    private Stage stage;
     public Socket_manager(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
-    public void connect() throws IOException {
+    public void connect() {
         while (true) {
             try {
                 socket = new Socket(host, port);
@@ -33,5 +35,9 @@ public class Socket_manager {
         if (socket != null) {
             socket.close();
         }
+    }
+
+    public void setPrimaryStage(Stage stage) {
+        this.stage = stage;
     }
 }

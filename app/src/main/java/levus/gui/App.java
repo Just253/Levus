@@ -11,10 +11,12 @@ import java.io.IOException;
 import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import levus.gui.connections.Socket_manager;
 import levus.gui.helper.ResizeHelper;
 
 
 public class App extends Application {
+    private Socket_manager socket_manager = new Socket_manager("localhost", 5000);
     @Override
     public void start(Stage stage) throws IOException {
         Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
@@ -36,8 +38,16 @@ public class App extends Application {
         stage.setScene(scene);
         ResizeHelper.addResizeListener(stage);
         stage.show();
-    }
 
+        new Thread(() -> {
+            socket_manager.setPrimaryStage(stage);
+            socket_manager.connect();
+        }).start();
+    
+    }
+    public void stop() throws IOException {
+        socket_manager.disconnect();
+    }
     public static void main(String[] args) {
         launch(args);
     }
