@@ -11,7 +11,6 @@ import java.io.IOException;
 import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
-import javafx.scene.layout.Region;
 import levus.gui.helper.ResizeHelper;
 
 
