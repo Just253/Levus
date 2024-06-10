@@ -42,6 +42,7 @@ public class App extends Application {
 
         new Thread(() -> {
             socket_manager.setPrimaryStage(stage);
+            socket_manager.setChatController(controller);
             socket_manager.connect();
         }).start();
     
