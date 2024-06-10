@@ -14,11 +14,24 @@ public class Socket_manager {
     }
 
     public void connect() throws IOException {
-        try {
-            socket = new Socket(host, port);
-        } catch (IOException e) {
-            System.out.println("Connection failed | Retrying...");
-            this.connect();
+        while (true) {
+            try {
+                socket = new Socket(host, port);
+                break; // Si la conexión es exitosa, salimos del bucle
+            } catch (IOException e) {
+                System.out.println("Connection failed | Retrying...");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    public void disconnect() throws IOException {
+        if (socket != null) {
+            socket.close();
         }
     }
 }
