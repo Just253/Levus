@@ -62,7 +62,7 @@ def connect_error():
 def disconnect():
     print("I'm disconnected!")
 
-@sio.on('response')
+@sio.on('response_id')
 def on_response(data):
     print('response received with ', data)
 
