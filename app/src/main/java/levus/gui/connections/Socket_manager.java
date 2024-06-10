@@ -14,6 +14,7 @@ public class Socket_manager {
     private String host;
     private int port;
     private Stage stage;
+    private ChatController chatController;
 
     public Socket_manager(String host, int port) {
         this.host = host;
@@ -40,6 +41,7 @@ public class Socket_manager {
                 break; // Si la conexión es exitosa, salimos del bucle
             } catch (Exception e) {
                 System.out.println("Connection failed | Retrying...");
+                e.printStackTrace();
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
@@ -47,6 +49,8 @@ public class Socket_manager {
                 }
             }
         }
+        ChatController chatController = getChatController();
+        chatController.setSocket(socket);
     }
 
     public void disconnect() throws IOException {
@@ -66,8 +70,10 @@ public class Socket_manager {
     public Stage getStage() {
         return stage;
     }
-
+    public void setChatController(ChatController chatController) {
+        this.chatController = chatController;
+    }
     public ChatController getChatController() {
-        return (ChatController) stage.getScene().getUserData();
+        return this.chatController;
     }
 }
