@@ -68,7 +68,7 @@ def on_response(data):
 
 @sio.on('chunks')
 def on_chunks(data):
-    print(data, end="")
+    print(data,flush=True)
 
 try:
     sio.connect('http://localhost:5000')
