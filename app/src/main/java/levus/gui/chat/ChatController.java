@@ -228,4 +228,12 @@ public class ChatController {
             }
         });
     }
+
+    public void setMessages(JSONArray messages) {
+        this.messages = messages;
+    }
+
+    public JSONArray getMessages() {
+        return messages;
+    }
 }
