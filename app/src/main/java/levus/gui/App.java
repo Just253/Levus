@@ -40,11 +40,20 @@ public class App extends Application {
         ResizeHelper.addResizeListener(stage);
         stage.show();
 
-        new Thread(() -> {
+        Thread thread = new Thread(() -> {
             socket_manager.setPrimaryStage(stage);
             socket_manager.setChatController(controller);
             socket_manager.connect();
-        }).start();
+        });
+        thread.start();
+        stage.setOnCloseRequest(e -> {
+            thread.interrupt();
+            try {
+                socket_manager.disconnect();
+            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+            }
+        });
     
     }
     public void stop() throws IOException {
