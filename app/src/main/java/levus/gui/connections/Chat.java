@@ -1,2 +1,4 @@
-package levus.gui.connections;public class chat {
+package levus.gui.connections;
+
+public class Chat {
 }
