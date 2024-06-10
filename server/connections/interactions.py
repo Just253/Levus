@@ -33,6 +33,17 @@ default_tool = [{
     }
 }]
 
+class client_updater:
+    process_id: str
+    content = ""
+    def __init__(self, process_id):
+        self.process_id = process_id
+    def update_content(self, content):
+        self.content += content
+        emit('chunks', {"process_id": self.process_id, "content": self.content})
+    def add_messages(self, messages):
+        emit('add_messages', {"process_id": self.process_id, "messages": messages})
+
 MAX_CALLS = 5
 system_message_content: str = ""
 def get_system_message():
@@ -54,6 +65,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     
     commands = dbCommands(app)
     all_tools = commands.getToolsNames()
+    client_updater_instance = client_updater(process_id)
     print("All tools: ", all_tools)
     import traceback
     try:
@@ -77,9 +89,12 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
             table.update_status(process_id=process_id, **kwargs)
     update_status(preview="...")
     try:
-        messages = get_responses(client, messages, model, commands)
+        messages = get_responses(client, messages, model, commands, client_updater_instance)
         print(messages)
         last_content = messages[-1]["content"]
+        client_updater_instance.content = last_content
+        client_updater_instance.update_content("")
+        client_updater_instance.add_messages(messages)
         update_status(status="completed", response=last_content, preview="")
     except Exception as e:
         error_type = type(e).__name__
@@ -159,8 +174,9 @@ class toolBody:
     function: toolFunction
     def __init__(self):
         self.function = toolFunction()   
-def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=default_tool) -> list[dict]:
+def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands,cui: client_updater, tools=default_tool) -> list[dict]:
     print("Messages: ", messages)
+    # TODO: add error messages
     try:
         body_response = {
             "role": "assistant",
@@ -203,7 +219,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands, tools=d
             if hasattr(delta, "content"):
                 content = delta.content
                 if content:
-                    emit('chunks', content)
+                    cui.update_content(content)
                     streaming_content += content
                     body_response_text = streaming_content 
             if delta.tool_calls:
