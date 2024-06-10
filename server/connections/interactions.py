@@ -91,11 +91,9 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     try:
         messages = get_responses(client, messages, model, commands, client_updater_instance)
         print(messages)
-        last_content = messages[-1]["content"]
-        client_updater_instance.content = last_content
-        client_updater_instance.update_content("")
+        messages[0]["content"][0]["text"] = client_updater_instance.content
         client_updater_instance.add_messages(messages)
-        update_status(status="completed", response=last_content, preview="")
+        update_status(status="completed", response=client_updater_instance.content, preview="")
     except Exception as e:
         error_type = type(e).__name__
         error_message = str(e)
@@ -261,7 +259,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands,cui: cli
         final_response = []
         new_messages += tools_responses
         if not all([tool["content"] == "Ejecutado correctamente sin respuesta" for tool in tools_responses]) or any([tool["name"] == "get_info_tool" for tool in tools_responses]):
-            final_response = get_responses(client, messages + new_messages, model, commandsDB, tools)
+            final_response = get_responses(client, messages + new_messages, model, commandsDB,cui, tools)
         else:
             body_response_text = "Comandos ejecutados correctamente"
     except Exception as e:
