@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import levus.gui.connections.Socket_manager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import javafx.scene.layout.VBox;
@@ -52,12 +53,16 @@ public class ChatController {
     @FXML
     private ToggleButton micButton;
 
+    @FXML
+    private ToggleButton camButton;
+
     private final VoskController voskController = new VoskController();
     private JSONArray messages;
     private Stage primaryStage;
     private Socket socket;
 
     String config_file = "config.json";
+    private Socket_manager socket_manager;
 
     public ChatController() throws IOException, InterruptedException {
     }
@@ -233,6 +238,9 @@ public class ChatController {
                 voskController.stopListening();
             }
         });
+        camButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            socket_manager.getCam().toggleCam(newValue);
+        });
     }
 
     public void setMessages(JSONArray messages) {
@@ -249,5 +257,13 @@ public class ChatController {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public void setSocket_manager(Socket_manager socket_manager) {
+        this.socket_manager = socket_manager;
+    }
+
+    public ToggleButton getToggleCamButton() {
+        return camButton;
     }
 }
