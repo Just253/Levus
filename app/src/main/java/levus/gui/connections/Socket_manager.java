@@ -15,6 +15,7 @@ public class Socket_manager {
     private int port;
     private Stage stage;
     private ChatController chatController;
+    private Cam cam;
 
     public Socket_manager(String host, int port) {
         this.host = host;
@@ -37,6 +38,7 @@ public class Socket_manager {
                     }
                 });
                 Chat chat = new Chat(this);
+                cam = new Cam(this);
                 socket.connect();
                 break; // Si la conexión es exitosa, salimos del bucle
             } catch (Exception e) {
@@ -75,5 +77,9 @@ public class Socket_manager {
     }
     public ChatController getChatController() {
         return this.chatController;
+    }
+
+    public Cam getCam() {
+        return cam;
     }
 }
