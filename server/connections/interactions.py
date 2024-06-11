@@ -279,6 +279,8 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands,cui: cli
                 final_response = get_responses(client, messages + new_messages, model, commandsDB,cui, tools)
             else:
                 body_response_content_zero["text"] = "Comandos ejecutados correctamente"
+                if cui.content == "":
+                    cui.update_content("Comandos ejecutados correctamente")
     except Exception as e:
         text = f"Error al realizar llamadas recursivas: {e}"
         print(text)
