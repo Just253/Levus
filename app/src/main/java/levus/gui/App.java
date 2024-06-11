@@ -41,9 +41,11 @@ public class App extends Application {
         stage.show();
 
         Thread thread = new Thread(() -> {
+            controller.setSocket_manager(socket_manager);
             socket_manager.setPrimaryStage(stage);
             socket_manager.setChatController(controller);
             socket_manager.connect();
+            socket_manager.getCam().setToggleCamButton(controller.getToggleCamButton());
         });
         thread.start();
         stage.setOnCloseRequest(e -> {
