@@ -34,15 +34,16 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
 <VBox fx:id="MainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-radius: 10;" stylesheets="@css/main.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="levus.gui.chat.ChatController">
    <children>
       <fx:include source="fxml/titleBar.fxml" VBox.vgrow="ALWAYS" />
-      <HBox fx:id="appContent" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+      <VBox fx:id="appContent" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
          <children>
-            <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+            <VBox prefHeight="200.0" prefWidth="390.0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                <children>
                   <ScrollPane fx:id="chatBox" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                      <content>
@@ -75,11 +76,10 @@
                      </VBox.margin>
                   </ScrollPane>
                </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
             </VBox>
-         </children></HBox>
+            <ImageView>
+            </ImageView>
+         </children></VBox>
       <HBox fx:id="micAndCamControlBox" alignment="CENTER" prefHeight="64.0" prefWidth="600.0" spacing="20.0" VBox.vgrow="NEVER">
          <children>
             <ToggleButton fx:id="micButton" contentDisplay="CENTER" mnemonicParsing="false" text="" HBox.hgrow="ALWAYS">
