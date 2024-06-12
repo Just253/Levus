@@ -48,7 +48,7 @@ public class Cam {
   public void toggleCam(Boolean isOn) {
     toggleCamButton.setSelected(isOn);
     Platform.runLater(() -> {
-        HBox contentApp = (HBox) socket_manager.getStage().getScene().lookup("#appContent");
+        VBox contentApp = (VBox) socket_manager.getStage().getScene().lookup("#appContent");
         if (isOn) {
             if (!contentApp.getChildren().contains(camImage)) {
                 contentApp.getChildren().add(camImage);
@@ -65,6 +65,7 @@ public class Cam {
   }
 
   public void makeImage() {
+    // TODO: LOAD FXML
     camImage = new ImageView();
     camImage.setFitWidth(640);
     camImage.setFitHeight(480);
