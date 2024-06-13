@@ -34,7 +34,6 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import org.kordamp.ikonli.javafx.*?>
 
@@ -77,8 +76,7 @@
                   </ScrollPane>
                </children>
             </VBox>
-            <ImageView>
-            </ImageView>
+
          </children></VBox>
       <HBox fx:id="micAndCamControlBox" alignment="CENTER" prefHeight="64.0" prefWidth="600.0" spacing="20.0" VBox.vgrow="NEVER">
          <children>
