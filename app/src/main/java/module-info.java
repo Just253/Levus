@@ -16,6 +16,7 @@ module levus.gui {
     requires java.desktop;
     requires socket.io.client;
     requires engine.io.client;
+    requires javafx.media;
     opens levus.gui to javafx.fxml;
     opens levus.gui.chat to javafx.fxml;
     opens levus.gui.titleBar to javafx.fxml;
