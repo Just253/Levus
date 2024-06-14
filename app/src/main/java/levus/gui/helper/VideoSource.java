@@ -1,3 +1,9 @@
+/*
+ * Source code from https://github.com/arskov/multipart-x-mixed-replace-java-player
+ * Author: Arseny Kovalchuk
+ * 
+ */
+
 package levus.gui.helper;
 
 import java.io.BufferedInputStream;
