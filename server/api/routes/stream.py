@@ -23,7 +23,9 @@ def stream():
             try:
                 print("Yielding frame")
                 yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+                       b'Content-Type: image/jpeg\r\n'
+                       b'Content-Length: ' + bytes(str(len(frame)), 'utf-8') + b'\r\n\r\n' +
+                       frame + b'\r\n\r\n')
             except:
                 print("Closing camera")
                 cap.release()
