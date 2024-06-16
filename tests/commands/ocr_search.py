@@ -1,37 +1,62 @@
 import tkinter as tk
-import screen_ocr
+import screen_ocr 
 import time
 
 root = tk.Tk()
-root.withdraw() 
-def create_transparent_box(match, number):
-    # Crea una ventana
-    window = tk.Toplevel()
-    window.geometry(f"{match.width}x{match.height}+{match.left}+{match.top}")
-    # Quita la barra de menú de la ventana
-    window.overrideredirect(True)
-    # Establece la opacidad de la ventana
-    window.attributes("-alpha", 0.5)
-    # Establece el color de fondo de la ventana
-    window.config(bg='red')
-    # Crea una etiqueta con el número en el centro de la ventana
-    label = tk.Label(window, text=str(number), bg='red', fg='white')
-    label.pack(expand=True, fill='both')
-    # Muestra la ventana
-    window.deiconify()
-    return window
-# Crea un lector de OCR
-ocr_reader = screen_ocr.Reader.create_quality_reader()
-# Lee la pantalla
-results = ocr_reader.read_screen()
-# Busca las palabras que coinciden con "Java"
-matches = results.find_matching_words("Java")
-# Crea una ventana para cada coincidencia
-windows = [create_transparent_box(match[0], i) for i, match in enumerate(matches, start=1)]
+root.withdraw()
 
-# Mantén el script en ejecución hasta que todas las ventanas se cierren
-# # Oculta la ventana principal
+def create_transparent_box(left, top, width, height, number):
+    
+    # Crear la ventana transparente
+    window = tk.Toplevel()
+    window.geometry(f"{width}x{height}+{left}+{top}")
+    
+    # Calcular las coordenadas para posicionar el número a la derecha
+    number_cordx = left+width
+    number_cordy = (height+top)/2
+    # Quitar la barra de menú de la ventana
+    window.overrideredirect(True)
+    
+    # Establecer la opacidad de la ventana
+    window.attributes("-alpha", 0.5)
+    
+    # Establecer el color de fondo de la ventana
+    window.config(bg='white')
+    
+    # Crear una etiqueta con el número al lado de la caja
+    label_match = tk.Label(window, text=str(number), bg='white', fg='black', font=('Arial', 12, 'bold'))
+    label_match.place(x=number_cordx, y=number_cordy, anchor='w')  # Posicionar el número a la derecha
+    
+    # Mostrar la ventana
+    window.deiconify()
+    
+    return window
+
+# Crear un lector de OCR
+ocr_reader = screen_ocr.Reader.create_quality_reader()
+
+# Leer la pantalla
+results = ocr_reader.read_screen()
+
+# Buscar las palabras que coinciden con "hola"
+matches = results.find_matching_words("hola")
+
+# Crear una ventana para cada coincidencia
+windows = []
+for i, match in enumerate(matches, start=1):
+    # Verificar si match es una lista y acceder correctamente a los atributos
+    if isinstance(match, list) and len(match) > 0:
+        left = match[0].left
+        top = match[0].top
+        width = match[0].width
+        height = match[0].height
+        window = create_transparent_box(left, top, width, height, i)
+        windows.append(window)
+
+# Mantener el script en ejecución hasta que todas las ventanas se cierren
 while windows:
     windows = [window for window in windows if window.winfo_exists()]
     root.update()
     time.sleep(1)
+
+root.mainloop()
