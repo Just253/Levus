@@ -33,3 +33,9 @@ Para iniciar el proyecto, simplemente ejecute el archivo `start.bash` en Linux o
 
 # Lista de Tareas
 ...
+
+# Agradecimientos
+
+Este proyecto utiliza "hand-gesture-recognition-using-mediapipe" de Shigeki Takahashi. Si utilizas este proyecto en tu investigación, por favor cítalo usando la siguiente referencia:
+
+Takahashi, S. (2020). hand-gesture-recognition-using-mediapipe. Recuperado de https://github.com/Kazuhito00/hand-gesture-recognition-using-mediapipe
