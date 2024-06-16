@@ -6,30 +6,27 @@ root = tk.Tk()
 root.withdraw()
 
 def create_transparent_box(left, top, width, height, number):
-    
+
     # Crear la ventana transparente
     window = tk.Toplevel()
-    window.geometry(f"{width}x{height}+{left}+{top}")
-    
-    # Calcular las coordenadas para posicionar el número a la derecha
-    number_cordx = left+width
-    number_cordy = (height+top)/2
+    window.geometry(f"{width+15}x{height}+{left}+{top}")
+
     # Quitar la barra de menú de la ventana
     window.overrideredirect(True)
-    
+
     # Establecer la opacidad de la ventana
     window.attributes("-alpha", 0.5)
-    
+
     # Establecer el color de fondo de la ventana
     window.config(bg='white')
-    
+
     # Crear una etiqueta con el número al lado de la caja
     label_match = tk.Label(window, text=str(number), bg='white', fg='black', font=('Arial', 12, 'bold'))
-    label_match.place(x=number_cordx, y=number_cordy, anchor='w')  # Posicionar el número a la derecha
-    
+    label_match.place(relx=1.0, rely=0.5,anchor='e')
+
     # Mostrar la ventana
     window.deiconify()
-    
+
     return window
 
 # Crear un lector de OCR
