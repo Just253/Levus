@@ -4,6 +4,7 @@ import csv
 import copy
 import argparse
 import itertools
+import os
 from collections import Counter
 from collections import deque
 
@@ -11,9 +12,9 @@ import cv2 as cv
 import numpy as np
 import mediapipe as mp
 
-from utils import CvFpsCalc
-from model import KeyPointClassifier
-from model import PointHistoryClassifier
+from .utils import CvFpsCalc
+from .model.keypoint_classifier.keypoint_classifier import KeyPointClassifier
+from .model.point_history_classifier.point_history_classifier import PointHistoryClassifier
 
 
 def get_args():
@@ -69,16 +70,20 @@ def main():
     keypoint_classifier = KeyPointClassifier()
 
     point_history_classifier = PointHistoryClassifier()
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    model_dir = os.path.join(current_dir, 'model')
+    kc_label_path = os.path.join(model_dir, 'keypoint_classifier/keypoint_classifier_label.csv')
+    phc_label_path = os.path.join(model_dir, 'point_history_classifier/point_history_classifier_label.csv')
 
     # ラベル読み込み ###########################################################
-    with open('model/keypoint_classifier/keypoint_classifier_label.csv',
+    with open(kc_label_path,
               encoding='utf-8-sig') as f:
         keypoint_classifier_labels = csv.reader(f)
         keypoint_classifier_labels = [
             row[0] for row in keypoint_classifier_labels
         ]
     with open(
-            'model/point_history_classifier/point_history_classifier_label.csv',
+            phc_label_path,
             encoding='utf-8-sig') as f:
         point_history_classifier_labels = csv.reader(f)
         point_history_classifier_labels = [
@@ -175,7 +180,9 @@ def main():
         debug_image = draw_info(debug_image, fps, mode, number)
 
         # 画面反映 #############################################################
-        yield debug_image
+        # to jpg
+        _, jpg = cv.imencode('.jpg', debug_image)
+        yield jpg.tobytes()
         #cv.imshow('Hand Gesture Recognition', debug_image)
 
     cap.release()
