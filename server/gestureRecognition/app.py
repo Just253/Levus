@@ -24,7 +24,7 @@ class HandGestureRecognition:
         self.min_detection_confidence = kwargs.get('min_detection_confidence', 0.7)
         self.min_tracking_confidence = kwargs.get('min_tracking_confidence', 0.5)
         self.use_brect = True
-        self.runnning = True
+        self.running = True
         self.load_models()
         self.load_labels()
         self.history_length = 16
@@ -61,8 +61,9 @@ class HandGestureRecognition:
             self.point_history_classifier_labels = [row[0] for row in csv.reader(f)]
 
     def run(self):
+        self.running = True
         mode = 0
-        while self.runnning:
+        while self.running:
             fps = self.cvFpsCalc.get()
             key = cv.waitKey(10)
             if key == 27:  # ESC
@@ -81,11 +82,16 @@ class HandGestureRecognition:
             results = self.hands.process(image)
             image.flags.writeable = True
 
+            hand_sign_text = None
+            finger_gesture_text = None
+            hand = None
+
             #  ####################################################################
             if results.multi_hand_landmarks is not None:
                 for hand_landmarks, handedness in zip(results.multi_hand_landmarks,
                                                     results.multi_handedness):
                     # 外接矩形の計算
+                    hand = handedness.classification[0].label[0:]
                     brect = calc_bounding_rect(debug_image, hand_landmarks)
                     # ランドマークの計算
                     landmark_list = calc_landmark_list(debug_image, hand_landmarks)
@@ -118,6 +124,9 @@ class HandGestureRecognition:
                     most_common_fg_id = Counter(
                         self.finger_gesture_history).most_common()
 
+                    hand_sign_text = self.keypoint_classifier_labels[hand_sign_id]
+                    finger_gesture_text = self.point_history_classifier_labels[most_common_fg_id[0][0]]
+
                     # 描画
                     debug_image = draw_bounding_rect(self.use_brect, debug_image, brect)
                     debug_image = draw_landmarks(debug_image, landmark_list)
@@ -125,8 +134,8 @@ class HandGestureRecognition:
                         debug_image,
                         brect,
                         handedness,
-                        self.keypoint_classifier_labels[hand_sign_id],
-                        self.point_history_classifier_labels[most_common_fg_id[0][0]],
+                        hand_sign_text,
+                        finger_gesture_text,
                     )
             else:
                 self.point_history.append([0, 0])
@@ -137,13 +146,11 @@ class HandGestureRecognition:
             # 画面反映 #############################################################
             # to jpg
             _, jpg = cv.imencode('.jpg', debug_image)
-            yield jpg.tobytes()
+            yield jpg.tobytes() , [hand_sign_text, finger_gesture_text, hand]
             #cv.imshow('Hand Gesture Recognition', debug_image)
-
     def shutdown(self):
-        self.runnning = False
+        self.running = False
         self.cap.release()
-        cv.destroyAllWindows()
 
 def select_mode(key, mode):
     number = -1
