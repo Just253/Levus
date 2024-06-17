@@ -8,4 +8,7 @@
   -fx-min-height: 50px;
   -fx-max-width: 50px;
   -fx-max-height: 50px;
+  -fx-background-color: #141414;
+  -fx-border-color: #e0e0e0;
+  -fx-border-radius: 100;
 }

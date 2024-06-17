@@ -1,11 +1,35 @@
-/*#titleBar {
-    -fx-background-color: -color-accent-9;
+#titleBar {
+    -fx-background-color: #141414;
+    -fx-padding: 10px;
 }
 
-#titleBar * {
-    -fx-background-color: -color-accent-9;
+.button {
+    -fx-background-color: #141414;
+    -fx-border-radius: 15;
 }
 
-FontIcon {
-    -fx-icon-color: black;
-}*/
+#userInputBox > * {
+    -fx-background-color: #141414;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 15;
+}
+
+#micAndCamControlBox {
+
+}
+
+.font-icon {
+    -fx-fill: #e0e0e0;
+}
+
+.button:hover {
+    -fx-background-color: #1C1C1C;
+}
+
+.bodyApp {
+    -fx-background-color: #0D0D0D;
+}
+
+.font-icon {
+    -fx-fill: #e0e0e0;
+}

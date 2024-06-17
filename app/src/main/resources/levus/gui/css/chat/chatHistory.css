@@ -1,4 +1,5 @@
 #chatHistory{
-  -fx-background-color: -color-base-7;
-
+  -fx-background-color: #1C1C1C;
+  -fx-padding: 10px;
+  -fx-background-radius: 10;
 }
