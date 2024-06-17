@@ -1,1 +1,1 @@
-from . import chat, cam
+from . import chat
