@@ -1,5 +1,5 @@
 from .command import Command
-import ctypes
+import pyautogui
 
 class BotCommand(Command):
     name="hide_all_windows"
@@ -7,8 +7,4 @@ class BotCommand(Command):
     
     def execute(self):
         # presionar tecla
-        ctypes.windll.user32.keybd_event(0x5B, 0, 0, 0)  # Tecla Windows abajo
-        ctypes.windll.user32.keybd_event(0x44, 0, 0, 0)  # Tecla D abajo
-        # soltar tecla
-        ctypes.windll.user32.keybd_event(0x44, 0, 2, 0)  # Tecla D arriba
-        ctypes.windll.user32.keybd_event(0x5B, 0, 2, 0)  # Tecla Windows arriba
+        pyautogui.hotkey('win', 'd')
