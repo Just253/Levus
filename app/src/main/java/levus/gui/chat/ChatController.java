@@ -241,6 +241,14 @@ public class ChatController {
         camButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             socket_manager.getCam().toggleCam(newValue);
         });
+
+        // si chat box es actualizado con un nuevo item y el scroll esta en la parte inferior, entonces el scroll se mueve a la parte inferior
+        chatBox.vvalueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() == 1.0) {
+                chatBox.setVvalue(1.0);
+            }
+        });
+        
     }
 
     public void setMessages(JSONArray messages) {
