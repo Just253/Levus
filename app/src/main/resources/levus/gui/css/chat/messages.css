@@ -1,16 +1,13 @@
 .label{
-  background-color: #f0f0f0;
-  -fx-background-color:purple;
-  -fx-text-fill:#e0e0e0;
+  -fx-text-fill: -main-bg-1;
   -fx-background-radius: 10px;
   -fx-padding: 10px;
-
 }
 
 .messages-assistant{
-    -fx-background-color: #293038;
+    -fx-background-color: -main-bg-3;
 }
 
 .messages-user{
-    -fx-background-color: #012b5b;
+    -fx-background-color: -main-bg-2;
 }

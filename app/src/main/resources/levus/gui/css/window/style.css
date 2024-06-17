@@ -1,35 +1,55 @@
 #titleBar {
-    -fx-background-color: #141414;
+    -fx-background-color: -main-bg-1;
     -fx-padding: 10px;
+    -fx-border-color: transparent transparent -main-bg-2 transparent; /* Color del borde inferior */
 }
 
 .button {
-    -fx-background-color: #141414;
+    -fx-background-color: -main-bg-1;
     -fx-border-radius: 15;
 }
-
+/*
 #userInputBox > * {
-    -fx-background-color: #141414;
-    -fx-border-color: #e0e0e0;
+    -fx-background-color: -main-bg-1;
     -fx-border-radius: 15;
 }
-
-#micAndCamControlBox {
-
-}
+*/
 
 .font-icon {
-    -fx-fill: #e0e0e0;
+    -fx-fill: -main-bg-4;
 }
 
 .button:hover {
-    -fx-background-color: #1C1C1C;
+    -fx-background-color: -main-bg-1;
 }
 
 .bodyApp {
-    -fx-background-color: #0D0D0D;
+    -fx-background-color: -main-bg-1;
 }
 
-.font-icon {
-    -fx-fill: #e0e0e0;
+.scroll-bar:vertical {
+    -fx-background-color: -main-bg-1;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: -main-bg-4; /* Cambia el color del thumb a blanco */
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: -main-bg-1; /* Cambia el color de la pista del scroll */
+}
+
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color: -main-bg-4; /* Cambia el color de los botones de incremento y decremento */
+}
+
+#inputTxt{
+    -fx-background-color: -main-bg-3;
+    -fx-border-radius: 15;
+}
+
+#btnSendMessage{
+    -fx-background-color: -main-bg-2;
+    -fx-border-radius: 15;
 }
