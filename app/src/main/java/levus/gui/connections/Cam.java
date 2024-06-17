@@ -32,10 +32,17 @@ public class Cam {
 
     public void toggleCam(Boolean isOn) {
         System.out.println("toggleCam called with: " + isOn);
-        toggleCamButton.setSelected(isOn);
         Platform.runLater(() -> {
+            toggleCamButton.setSelected(isOn);
             VBox contentApp = (VBox) socket_manager.getStage().getScene().lookup("#appContent");
             if (isOn) {
+                if (videoSource != null) {
+                    videoSource.disconnect();
+                }
+                if (contentApp.getChildren().contains(imageView)) {
+                    contentApp.getChildren().remove(imageView);
+                }
+
                 System.out.println("Turning on the camera");
                 videoSource = new VideoSource("http://127.0.0.1:5000/stream"); // URL del flujo MJPEG
                 try {
@@ -66,7 +73,10 @@ public class Cam {
                 if (videoSource != null) {
                     videoSource.disconnect();
                 }
-                contentApp.getChildren().remove(imageView);
+                if (contentApp.getChildren().contains(imageView)) {
+                    System.out.println("Removing imageView from contentApp");
+                    contentApp.getChildren().remove(imageView);
+                }
             }
         });
     }
