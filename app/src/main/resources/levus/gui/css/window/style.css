@@ -4,23 +4,21 @@
     -fx-border-color: transparent transparent -main-bg-2 transparent; /* Color del borde inferior */
 }
 
+.ikonli-font-icon {
+    -fx-icon-color: -main-bg-1;
+}
+
+#titleBar .ikonli-font-icon {
+    -fx-icon-color: -main-bg-2;
+}
+
 .button {
     -fx-background-color: -main-bg-1;
     -fx-border-radius: 15;
 }
-/*
-#userInputBox > * {
-    -fx-background-color: -main-bg-1;
-    -fx-border-radius: 15;
-}
-*/
-
-.font-icon {
-    -fx-fill: -main-bg-4;
-}
 
 .button:hover {
-    -fx-background-color: -main-bg-1;
+    -fx-background-color: derive(-main-bg-1,20%);
 }
 
 .bodyApp {
@@ -47,6 +45,7 @@
 #inputTxt{
     -fx-background-color: -main-bg-3;
     -fx-border-radius: 15;
+    -fx-text-fill: -main-bg-1;
 }
 
 #btnSendMessage{
