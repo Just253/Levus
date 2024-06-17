@@ -1,7 +1,13 @@
-from ..gestureRecognition.app import main
-
+from ..gestureRecognition.app import HandGestureRecognition
+HGR = HandGestureRecognition()
+import cv2
 def generate():
-    images = main()
+    cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    if not cap.isOpened():
+        print("Error: Could not open video.")
+        return
+    HGR.set_camera(cap)
+    images = HGR.run()
     for frame in images:
         try:
             header = (b'--frame\r\n'
@@ -11,4 +17,5 @@ def generate():
             yield header + frame + footer
         except Exception as e:
             print(e)
-            return
+            break
+    HGR.shutdown()
