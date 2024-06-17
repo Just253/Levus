@@ -90,7 +90,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     update_status(preview="...")
     try:
         messages = get_responses(client, messages, model, commands, client_updater_instance)
-        print(messages)
+        #print(messages)
         messages[0]["content"][0]["text"] = client_updater_instance.content
         client_updater_instance.add_messages(messages)
         update_status(status="completed", response=client_updater_instance.content, preview="")
@@ -185,7 +185,7 @@ def clean_message_tools(messages):
 def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands,cui: client_updater, tools=default_tool) -> list[dict]:
     print("Messages: ", messages)
     messages = clean_message_tools(messages)
-    print("Messages cleaned: ", messages)
+    #print("Messages cleaned: ", messages)
     print("Tools listed: ", tools)
     # TODO: add error messages
     try:
@@ -272,7 +272,7 @@ def get_responses(client: OpenAI, messages,model,commandsDB: dbCommands,cui: cli
         # si la respuesta de todos los tools son "Ejecutado correctamente sin respuesta" entonces no se envia final_response
         final_response = []
         new_messages += tools_responses
-        print("Tools call", tool_calls)
+        #print("Tools call", tool_calls)
         print("Tools responses", tools_responses)
         if len(tool_calls):
             if not all([tool["content"] == "Ejecutado correctamente sin respuesta" for tool in tools_responses]) or any([tool["name"] == "get_info_tool" for tool in tools_responses]):
