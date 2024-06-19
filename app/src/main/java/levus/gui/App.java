@@ -8,6 +8,8 @@ import javafx.stage.StageStyle;
 import levus.gui.chat.ChatController;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+
 import atlantafx.base.theme.*;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
@@ -44,7 +46,11 @@ public class App extends Application {
             controller.setSocket_manager(socket_manager);
             socket_manager.setPrimaryStage(stage);
             socket_manager.setChatController(controller);
-            socket_manager.connect();
+            try {
+                socket_manager.connect();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
             socket_manager.getCam().setToggleCamButton(controller.getToggleCamButton());
         });
         thread.start();
