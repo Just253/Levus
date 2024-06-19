@@ -69,23 +69,37 @@ public class VideoSource implements Iterable<byte[]> {
     public void disconnect() {
         if (this.conn != null)
             this.conn.disconnect();
+        if (this.iterator != null) {
+            this.iterator.close();
+            this.iterator = null;
+        }
     }
 
     @Override
     public Iterator<byte[]> iterator() {
         try {
-            if (this.iterator == null) {
-                this.iterator = new ImagesIterator(boundaryPart, conn);
-            }
-            return this.iterator;
+            return getIterator();
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
+    public byte[] getNextFrame() throws IOException {
+        iterator = (ImagesIterator) getIterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null; 
+    }
 
-    private class ImagesIterator implements Iterator<byte[]> {
-        
+    public Iterator<byte[]> getIterator() throws IOException {
+        if (this.iterator == null) {
+            this.iterator = new ImagesIterator(boundaryPart, conn);
+        }
+        return this.iterator;
+    }
+
+    private static class ImagesIterator implements Iterator<byte[]> {
+
         private byte LF = 0x0A;
         private byte CR = 0x0D;
 
@@ -196,9 +210,9 @@ public class VideoSource implements Iterable<byte[]> {
                     
                     return buffer;
                 } catch (IOException | InterruptedException e) {
-                    // e.printStackTrace();
+                    //e.printStackTrace();
                     // see StreamThread how it's to be used.
-                    throw new RuntimeException(e);
+                    return null;
                 }
             }
         }
@@ -216,6 +230,7 @@ public class VideoSource implements Iterable<byte[]> {
             try {
                 this.stream.close();
             } catch (IOException e) {
+                System.out.println("Error closing stream");
                 e.printStackTrace();
             }
         }
