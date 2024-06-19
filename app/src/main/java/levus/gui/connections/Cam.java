@@ -120,6 +120,7 @@ public class Cam {
 
             imageView.setPreserveRatio(true);
             imageView.fitWidthProperty().bind(stage.widthProperty());
+            imageView.fitHeightProperty().bind(stage.heightProperty());
 
             Scene scene = new Scene(root, 960, 540);
             stage.setScene(scene);
