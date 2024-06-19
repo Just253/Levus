@@ -8,6 +8,7 @@ import io.socket.emitter.Emitter;
 import levus.gui.chat.ChatController;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class Socket_manager {
     private Socket socket;
@@ -22,39 +23,47 @@ public class Socket_manager {
         this.port = port;
     }
 
-    public void connect() {
-        while (true) {
+    public void connect() throws URISyntaxException {
+        socket = IO.socket("http://" + host + ":" + port);
+        setupEventListeners();
+        attemptConnection(5); // Intenta conectar hasta 5 veces
+        initializeComponents();
+    }
+    
+    private void setupEventListeners() {
+        socket.on(Socket.EVENT_CONNECT, args -> System.out.println("Connected!"))
+              .on(Socket.EVENT_DISCONNECT, args -> System.out.println("Disconnected!"));
+    }
+    
+    private void attemptConnection(int maxAttempts) {
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                socket = IO.socket("http://" + host + ":" + port);
-                socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        System.out.println("Connected!");
-                    }
-                }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-                    @Override
-                    public void call(Object... args) {
-                        System.out.println("Disconnected!");
-                    }
-                });
-                Chat chat = new Chat(this);
-                cam = new Cam(this);
+                System.out.println("Attempting to connect, try " + attempt);
                 socket.connect();
-                break; // Si la conexión es exitosa, salimos del bucle
+                return; // Salir si la conexión es exitosa
             } catch (Exception e) {
                 System.out.println("Connection failed | Retrying...");
                 e.printStackTrace();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+                waitForRetry();
             }
         }
+        System.out.println("Failed to connect after " + maxAttempts + " attempts.");
+    }
+    
+    private void waitForRetry() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    private void initializeComponents() {
+        new Chat(this);
+        cam = new Cam(this);
         ChatController chatController = getChatController();
         chatController.setSocket(socket);
     }
-
     public void disconnect() throws IOException {
         if (socket != null) {
             socket.close();
