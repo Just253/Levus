@@ -7,13 +7,11 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import levus.gui.helper.ResizeHelper;
 import levus.gui.helper.VideoSource;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
@@ -22,15 +20,54 @@ public class Cam {
     private VideoSource videoSource;
     private Boolean isOn = false;
     private ToggleButton toggleCamButton;
-    private ImageView imageView; // Para mostrar imágenes del flujo
-    private Stage videoStage; // Referencia al Stage de la ventana de la cámara
+    private ImageView imageView;
+    private Stage videoStage;
+    private Thread videoThread;
+    private volatile boolean running = false;
 
     public Cam(Socket_manager socket_manager) {
         this.socket_manager = socket_manager;
         this.imageView = new ImageView();
-        this.imageView.setFitWidth(640); // Configurar tamaño preferido
+        this.imageView.setFitWidth(640);
         this.imageView.setFitHeight(480);
+        this.videoSource = new VideoSource("http://127.0.0.1:5000/stream");
         this.add_listeners();
+        setupVideoThread();
+    }
+
+    private void setupVideoThread() {
+        videoThread = new Thread(() -> {
+            while (true) {
+                if (running) {
+                    byte[] img = null;
+                    try {
+                        img = videoSource.getNextFrame();
+                    } catch (IOException e) {
+                        continue;
+                    }
+                    if (img != null) {
+                        byte[] finalImg = img;
+                        Platform.runLater(() -> {
+                            //System.out.println("Updating image");
+                            Image image = new Image(new ByteArrayInputStream(finalImg));
+                            if (!image.isError()) {
+                                imageView.setImage(image);
+                            }else{
+                                System.out.println("Error loading image");
+                            }
+                        });
+                    }
+                } else {
+                    try {
+                        Thread.sleep(100); // Reduce CPU usage when not running
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        });
+        videoThread.setDaemon(true);
+        videoThread.start();
     }
 
     public void add_listeners() {
@@ -45,45 +82,23 @@ public class Cam {
         Platform.runLater(() -> {
             toggleCamButton.setSelected(isOn);
             if (isOn) {
-                if (videoSource != null) {
-                    videoSource.disconnect();
-                }
-
                 System.out.println("Turning on the camera");
-                videoSource = new VideoSource("http://127.0.0.1:5000/stream"); // URL del flujo MJPEG
                 try {
                     videoSource.connect();
-                    if (videoStage == null) {
-                        videoStage = newStage();
-                    }
-                    videoStage.show(); // Mostrar la ventana
-
-                    new Thread(() -> {
-                        for (byte[] img : videoSource) {
-                            System.out.println("New image received");
-                            Platform.runLater(() -> {
-                                Image image = new Image(new ByteArrayInputStream(img));
-                                if (!image.isError()) {
-                                    imageView.setImage(image);
-                                } else {
-                                    System.out.println("Error loading image");
-                                    // Manejar el error de carga de la imagen aquí
-                                }
-                            });
-                        }
-                    }).start();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    running = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+                if (videoStage == null) {
+                    videoStage = newStage();
+                }
+                videoStage.show();
             } else {
                 System.out.println("Turning off the camera");
-                if (videoSource != null) {
-                    videoSource.disconnect();
-                }
+                running = false;
+                videoSource.disconnect();
                 if (videoStage != null) {
-                    System.out.println("Closing camera window");
-                    videoStage.close(); // Cerrar la ventana
-                    videoStage = null; // Eliminar la referencia para permitir la creación de una nueva ventana más tarde
+                    videoStage.close();
                 }
             }
         });
@@ -96,32 +111,25 @@ public class Cam {
     public Stage newStage() {
         try {
             Stage stage = new Stage();
-            stage.initStyle(StageStyle.UNDECORATED); // Ventana sin barra de título
+            stage.initStyle(StageStyle.UNDECORATED);
 
-            VBox root = new VBox(); // Usar VBox como contenedor principal
-
-            // Cargar la barra de herramientas desde el archivo XML
+            VBox root = new VBox();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/levus/gui/fxml/titleBar.fxml"));
             ToolBar toolBar = loader.load();
+            root.getChildren().addAll(toolBar, imageView);
 
-            // Añadir la barra de herramientas y el ImageView al VBox
-            root.getChildren().add(toolBar);
-            root.getChildren().add(imageView);
-
-            // Configurar el ImageView para que respete su tamaño
             imageView.setPreserveRatio(true);
-            imageView.fitWidthProperty().bind(stage.widthProperty()); // Ajustar el ancho del ImageView al ancho del stage
+            imageView.fitWidthProperty().bind(stage.widthProperty());
 
-            Scene scene = new Scene(root, 960, 540); // Tamaño inicial de la ventana
+            Scene scene = new Scene(root, 960, 540);
             stage.setScene(scene);
 
-            ResizeHelper rh = new ResizeHelper();
-            rh.addResizeListener(stage); // Asumiendo que ResizeHelper ajusta el tamaño de la ventana correctamente
+            ResizeHelper.addResizeListener(stage);
 
             return stage;
         } catch (IOException e) {
             e.printStackTrace();
-            return null; // En caso de error, retorna null o maneja el error adecuadamente
+            return null;
         }
     }
 }
