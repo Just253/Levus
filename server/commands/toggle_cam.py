@@ -17,4 +17,3 @@ class BotCommand(Command):
         else:
             return "Invalid value"
     socketio.emit('ToggleCam', value)
-    return "Camera toggled"
