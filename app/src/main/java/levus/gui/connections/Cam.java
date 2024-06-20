@@ -72,8 +72,11 @@ public class Cam {
 
     public void add_listeners() {
         socket_manager.getSocket().on("ToggleCam", args -> {
-            isOn = (Boolean) args[0];
-            toggleCam(isOn);
+            Boolean tempisOn = (Boolean) args[0];
+            if (tempisOn != isOn) {
+                isOn = tempisOn;
+                toggleCam(isOn);
+            }
         });
     }
 
