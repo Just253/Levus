@@ -38,7 +38,7 @@ def processGesture(name, history, hand, last_time):
 
     return last_time
 
-def generate():
+def generate(debug_mode=False):
     cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     if not cap.isOpened():
         print("Error: Could not open video.")
@@ -51,7 +51,8 @@ def generate():
             try:
                 actual_gesture, history_gesture, hand = info
                 # Actualiza last_time con el valor devuelto por processGesture
-                last_time = processGesture(actual_gesture, history_gesture, hand, last_time)
+                if not debug_mode:
+                    last_time = processGesture(actual_gesture, history_gesture, hand, last_time)
                 header = (b'--frame\r\n'
                           b'Content-Type: image/jpeg\r\n'
                           b'Content-Length: ' + bytes(str(len(frame)), 'utf-8') + b'\r\n\r\n')
