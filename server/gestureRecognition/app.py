@@ -16,6 +16,8 @@ from .utils import CvFpsCalc
 from .model.keypoint_classifier.keypoint_classifier import KeyPointClassifier
 from .model.point_history_classifier.point_history_classifier import PointHistoryClassifier
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.path.join(current_dir, 'model')
 class HandGestureRecognition:
     def __init__(self,**kwargs):
         self.cap_width = kwargs.get('width', 960)
@@ -51,8 +53,6 @@ class HandGestureRecognition:
         self.point_history_classifier = PointHistoryClassifier()
 
     def load_labels(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        model_dir = os.path.join(current_dir, 'model')
         kc_label_path = os.path.join(model_dir, 'keypoint_classifier/keypoint_classifier_label.csv')
         phc_label_path = os.path.join(model_dir, 'point_history_classifier/point_history_classifier_label.csv')
         with open(kc_label_path, encoding='utf-8-sig') as f:
@@ -63,12 +63,14 @@ class HandGestureRecognition:
     def run(self):
         self.running = True
         mode = 0
+        number = -1
         while self.running:
             fps = self.cvFpsCalc.get()
             key = cv.waitKey(10)
             if key == 27:  # ESC
                 break
-            number, mode = select_mode(key, mode)
+            _number, mode = select_mode(key, mode,number)
+            number = _number if _number != number else number
             ret, image = self.cap.read()
             if not ret:
                 break
@@ -146,14 +148,13 @@ class HandGestureRecognition:
             # 画面反映 #############################################################
             # to jpg
             _, jpg = cv.imencode('.jpg', debug_image)
-            yield jpg.tobytes() , [hand_sign_text, finger_gesture_text, hand]
+            yield jpg.tobytes() , [hand_sign_text, finger_gesture_text, hand], debug_image
             #cv.imshow('Hand Gesture Recognition', debug_image)
     def shutdown(self):
         self.running = False
         self.cap.release()
 
-def select_mode(key, mode):
-    number = -1
+def select_mode(key, mode,number):
     if 48 <= key <= 57:  # 0 ~ 9
         number = key - 48
     if key == 110:  # n
@@ -253,12 +254,12 @@ def logging_csv(number, mode, landmark_list, point_history_list):
     if mode == 0:
         pass
     if mode == 1 and (0 <= number <= 9):
-        csv_path = 'model/keypoint_classifier/keypoint.csv'
+        csv_path = os.path.join(model_dir, 'keypoint_classifier/keypoint.csv')
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *landmark_list])
     if mode == 2 and (0 <= number <= 9):
-        csv_path = 'model/point_history_classifier/point_history.csv'
+        csv_path = os.path.join(model_dir, 'point_history_classifier/point_history.csv')
         with open(csv_path, 'a', newline="") as f:
             writer = csv.writer(f)
             writer.writerow([number, *point_history_list])
