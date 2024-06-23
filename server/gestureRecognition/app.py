@@ -281,20 +281,26 @@ def draw_landmarks(image, landmark_point):
     color_blanco = (255, 255, 255)
     # Definir las conexiones usando un diccionario
     connections = {
+        # indice
         2: [3, 5],
         3: [4],
+        # dedo medio
         5: [6, 9],
         6: [7],
         7: [8],
+        # anular
         9: [10, 13],
         10: [11],
         11: [12],
+        # meñique
         13: [14, 17],
         14: [15],
         15: [16],
+        # pulgar
         17: [18, 0],
         18: [19],
         19: [20],
+        #palma
         0: [1],
         1: [2]
     }
