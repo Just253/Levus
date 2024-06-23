@@ -47,7 +47,7 @@ def generate(debug_mode=False):
     images = HGR.run()
     last_time = time.time()  # Inicializa last_time antes de comenzar el bucle
     try:
-        for frame, info in images:
+        for frame, info,_ in images:
             try:
                 actual_gesture, history_gesture, hand = info
                 # Actualiza last_time con el valor devuelto por processGesture
