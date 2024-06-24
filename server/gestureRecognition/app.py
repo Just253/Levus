@@ -5,6 +5,7 @@ import copy
 import argparse
 import itertools
 import os
+import math
 from collections import Counter
 from collections import deque
 
@@ -60,12 +61,29 @@ class HandGestureRecognition:
         with open(phc_label_path, encoding='utf-8-sig') as f:
             self.point_history_classifier_labels = [row[0] for row in csv.reader(f)]
 
+    def calculate_velocity(self,current_landmark, previous_landmark):
+        if previous_landmark is None:
+            return 0
+        distance = math.sqrt((current_landmark[0] - previous_landmark[0]) ** 2 + (current_landmark[1] - previous_landmark[1]) ** 2)
+        return distance
+    
+    def calc_center_of_hand(self, landmarks):
+        x_coords = [landmark.x for landmark in landmarks.landmark]
+        y_coords = [landmark.y for landmark in landmarks.landmark]
+
+        # Calcula el centro como el promedio de las coordenadas x e y
+        center_x = np.mean(x_coords)
+        center_y = np.mean(y_coords)
+
+        return (center_x, center_y)
+
     def run(self):
         self.running = True
         mode = 0
         number = -1
         smoothed_landmarks = {}
         alpha = 0.5
+        previous_center_point = None
         while self.running:
             fps = self.cvFpsCalc.get()
             key = cv.waitKey(10)
@@ -93,6 +111,15 @@ class HandGestureRecognition:
             #  ####################################################################
             if results.multi_hand_landmarks is not None:
                 for hand_index, (hand_landmarks, handedness) in enumerate(zip(results.multi_hand_landmarks, results.multi_handedness)):
+
+                    # Cálculo del centro de la mano como ejemplo
+                    center_point = self.calc_center_of_hand(hand_landmarks)
+                    velocity = self.calculate_velocity(center_point, previous_center_point)
+                    previous_center_point = center_point
+                    # Ajustar alpha basado en la velocidad
+                    # Nota: Ajusta los valores 0.1 y 0.9 según sea necesario para tu aplicación
+                    alpha = max(0.1, min(0.9, 1 - velocity / 10))
+
                     # 外接矩形の計算
                     hand = handedness.classification[0].label[0:]
                     brect = calc_bounding_rect(debug_image, hand_landmarks)
@@ -355,6 +382,7 @@ def draw_info_text(image, brect, handedness, hand_sign_text,
 
 
 def draw_point_history(image, point_history):
+    return image
     for index, point in enumerate(point_history):
         # Asegurarse de que point contiene valores numéricos
         if isinstance(point[0], (int, float)) and isinstance(point[1], (int, float)):
