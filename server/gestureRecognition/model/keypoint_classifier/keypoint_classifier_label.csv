@@ -1,5 +1,7 @@
 ﻿Open
 Close
 Pointer
-Mouse_static
-Mouse_click_right
+mouse_up
+mouse_down
+mouse_right
+mouse_left
