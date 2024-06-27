@@ -15,7 +15,6 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -90,7 +89,7 @@ public class VoskController {
         };
         return listenTask;
     }
-    
+
     public void setThread(Thread thread) {
         this.thread = thread;
     }
@@ -112,7 +111,7 @@ public class VoskController {
         return microphone;
     }
     public void  sendText(String text) throws UnsupportedEncodingException {
-        String unicodeText = new String(text.getBytes(), "UTF-8"); 
+        String unicodeText = new String(text.getBytes(), "UTF-8");
         System.out.println("Sending text: " + unicodeText);
         Platform.runLater(() -> {
             this.textField.setText(unicodeText);
@@ -121,7 +120,7 @@ public class VoskController {
         });
     }
     public void changeText(String text) throws UnsupportedEncodingException {
-        String unicodeText = new String(text.getBytes(), "UTF-8"); 
+        String unicodeText = new String(text.getBytes(), "UTF-8");
         Platform.runLater(() -> {
             this.textField.setText(unicodeText);
         });
@@ -146,12 +145,21 @@ public class VoskController {
     public void setToggleButton(ToggleButton toggleButton) {
         this.toggleButton = toggleButton;
     }
-    
+
+    public ToggleButton getToggleButton() {
+        return this.toggleButton;
+    }
+
     public void stopListening() {
         if (this.thread != null) {
             this.thread.interrupt();
             this.thread = null;
         }
+
+        Platform.runLater(() -> {
+            this.getToggleButton().setSelected(false);
+        });
+
     }
 
     private Model getModel() throws IOException, InterruptedException {
@@ -166,13 +174,13 @@ public class VoskController {
     private void downloadAndExtractModel() throws IOException, InterruptedException {
         String modelUrl = "https://alphacephei.com/kaldi/models/" + modelName + ".zip";
         Path tempZip = Files.createTempFile("model", ".zip");
-    
+
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(modelUrl))
                 .build();
         HttpResponse<Path> response = client.send(request, HttpResponse.BodyHandlers.ofFile(tempZip));
-    
+
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(tempZip.toFile()))) {
             ZipEntry entry = zis.getNextEntry();
             while (entry != null) {
@@ -189,7 +197,7 @@ public class VoskController {
                     if (!parent.isDirectory() && !parent.mkdirs()) {
                         throw new IOException("Failed to create directory " + parent);
                     }
-    
+
                     try (FileOutputStream fos = new FileOutputStream(file)) {
                         byte[] buffer = new byte[1024];
                         int length;
@@ -201,7 +209,7 @@ public class VoskController {
                 entry = zis.getNextEntry();
             }
         }
-    
+
         Files.delete(tempZip);
     }
 

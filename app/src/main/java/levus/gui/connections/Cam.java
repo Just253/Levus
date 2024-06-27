@@ -74,6 +74,7 @@ public class Cam {
         socket_manager.getSocket().on("ToggleCam", args -> {
             Boolean tempisOn = (Boolean) args[0];
             if (tempisOn != isOn) {
+                if(tempisOn) socket_manager.getChatController().getVoskController().stopListening();
                 isOn = tempisOn;
                 toggleCam(isOn);
             }

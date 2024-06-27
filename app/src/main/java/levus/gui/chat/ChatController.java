@@ -56,6 +56,10 @@ public class ChatController {
     @FXML
     private ToggleButton camButton;
 
+    public VoskController getVoskController() {
+        return voskController;
+    }
+
     private final VoskController voskController = new VoskController();
     private JSONArray messages;
     private Stage primaryStage;
