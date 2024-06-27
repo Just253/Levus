@@ -4,6 +4,7 @@ from ..commands.show_minimized_windows import BotCommand as show_minimized_windo
 HGR = HandGestureRecognition()
 import cv2
 import time
+import pyautogui
 
 def timer(last_time):
     current_time = time.time()
@@ -35,6 +36,15 @@ def processGesture(name, history, hand, last_time):
             print("Showing all windows")
             show_minimized_windows().execute()
             last_time = new_time  # Actualiza last_time solo si se ejecuta el comando
+
+    if name == 'mouse_up':
+        pyautogui.move(0, -5) 
+    elif name == 'mouse_down':
+        pyautogui.move(0, 5)  
+    elif name == 'mouse_right':
+        pyautogui.move(5, 0)  
+    elif name == 'mouse_left':
+        pyautogui.move(-5, 0) 
 
     return last_time
 
