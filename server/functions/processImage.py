@@ -63,7 +63,7 @@ def processGesture(name, history, hand, last_time):
         return last_time
 
     history = history.lower()
-    if hand == 'right' and history == 'clockwise':
+    if hand == 'right' and name == 'open':
         should_execute, new_time = timer(last_time)
         if should_execute:
             print("Showing all windows")
