@@ -8,7 +8,7 @@ import pyautogui
 
 def timer(last_time):
     current_time = time.time()
-    if current_time - last_time > 5:
+    if current_time - last_time > 2:
         return True, current_time
     return False, last_time
 
@@ -45,6 +45,12 @@ def processGesture(name, history, hand, last_time):
         pyautogui.move(5, 0)  
     elif name == 'mouse_left':
         pyautogui.move(-5, 0) 
+
+    if name == 'Ok':
+        should_execute, new_time = timer(last_time) 
+        if should_execute:
+            pyautogui.click()
+            last_time = new_time
 
     return last_time
 
