@@ -12,6 +12,39 @@ def timer(last_time):
         return True, current_time
     return False, last_time
 
+import ctypes
+from ctypes import wintypes
+
+# Constantes para eventos del mouse
+MOUSEEVENTF_MOVE = 0x0001
+MOUSEEVENTF_LEFTDOWN = 0x0002
+MOUSEEVENTF_LEFTUP = 0x0004
+MOUSEEVENTF_RIGHTDOWN = 0x0008
+MOUSEEVENTF_RIGHTUP = 0x0010
+MOUSEEVENTF_ABSOLUTE = 0x8000
+
+# Funciones de la API de Windows
+SetCursorPos = ctypes.windll.user32.SetCursorPos
+mouse_event = ctypes.windll.user32.mouse_event
+
+# Estructura para la posición del cursor
+class POINT(ctypes.Structure):
+    _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+
+# Obtener la posición actual del cursor
+def get_cursor_pos():
+    point = POINT()
+    ctypes.windll.user32.GetCursorPos(ctypes.byref(point))
+    return point.x, point.y
+
+def move_mouse(x, y):
+    current_x, current_y = get_cursor_pos()
+    SetCursorPos(current_x + x, current_y + y)
+
+def click_mouse():
+    mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+    mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+
 def processGesture(name, history, hand, last_time):
     if name is None or hand is None:
         return last_time
@@ -20,36 +53,36 @@ def processGesture(name, history, hand, last_time):
     hand = hand.lower()
 
     if hand == 'left' and name == 'close':
-        should_execute, new_time = timer(last_time)  # Calcula si debe ejecutar sin actualizar last_time aún
+        should_execute, new_time = timer(last_time)
         if should_execute:
             print("Hidding all windows")
             hide_all_windows().execute()
-            last_time = new_time  # Actualiza last_time solo si se ejecuta el comando
+            last_time = new_time
 
     if history is None:
         return last_time
 
     history = history.lower()
     if hand == 'right' and history == 'clockwise':
-        should_execute, new_time = timer(last_time)  # Calcula si debe ejecutar sin actualizar last_time aún
+        should_execute, new_time = timer(last_time)
         if should_execute:
             print("Showing all windows")
             show_minimized_windows().execute()
-            last_time = new_time  # Actualiza last_time solo si se ejecuta el comando
+            last_time = new_time
 
     if name == 'mouse_up':
-        pyautogui.move(0, -5) 
+        move_mouse(0, -5)
     elif name == 'mouse_down':
-        pyautogui.move(0, 5)  
+        move_mouse(0, 5)
     elif name == 'mouse_right':
-        pyautogui.move(5, 0)  
+        move_mouse(-5, 0)
     elif name == 'mouse_left':
-        pyautogui.move(-5, 0) 
+        move_mouse(5, 0)
 
-    if name == 'Ok':
-        should_execute, new_time = timer(last_time) 
+    if name == 'ok':
+        should_execute, new_time = timer(last_time)
         if should_execute:
-            pyautogui.click()
+            click_mouse()
             last_time = new_time
 
     return last_time
