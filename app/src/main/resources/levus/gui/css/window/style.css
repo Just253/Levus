@@ -1,7 +1,7 @@
 #titleBar {
     -fx-background-color: -main-bg-1;
     -fx-padding: 10px;
-    -fx-border-color: transparent transparent -main-bg-2 transparent; /* Color del borde inferior */
+    -fx-border-color: transparent transparent derive(-main-bg-2, 20%) transparent; /* Color del borde inferior */
 }
 
 .ikonli-font-icon {
@@ -51,4 +51,11 @@
 #btnSendMessage{
     -fx-background-color: -main-bg-2;
     -fx-border-radius: 15;
+}
+
+/* Linea alrededor de la pantalla principal*/
+#MainContainer {
+    -fx-border-color: derive(-main-bg-1, 90%);
+    -fx-border-width: 0.5;
+    -fx-border-radius: 10;
 }
