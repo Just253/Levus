@@ -1,8 +1,11 @@
 package levus.gui.connections;
 
+
 import io.socket.client.Socket;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import levus.gui.chat.ChatController;
 import org.json.JSONArray;
@@ -32,14 +35,15 @@ public class Chat {
 
             Stage stage = socket_manager.getStage();
             // element with id process_id
-            Label label = (Label) stage.getScene().lookup("#" + process_id);
+            Text message = (Text) stage.getScene().lookup("#" + process_id);
 
             Platform.runLater(() -> {
-                if (label == null) {
+                if (message == null) {
                     ChatController chatController = socket_manager.getChatController();
                     chatController.makeLabel(content, "assistant", process_id);
                 }
-                label.setText(content);
+                assert message != null;
+                message.setText(content);
             });
         });
 
