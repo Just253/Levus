@@ -196,7 +196,7 @@ class HandGestureRecognition:
 def select_mode(key, mode,number):
     block_numbers = [110, 107, 104]
     if 97 <= key <= 122 and key not in block_numbers: # a-z but not n,k,h
-        number = key - 65
+        number = key - 97
     if key == 110:  # n
         mode = 0
     if key == 107:  # k
