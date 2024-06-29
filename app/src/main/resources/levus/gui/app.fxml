@@ -73,7 +73,7 @@
             </ToggleButton>
             <HBox fx:id="userInputBox" alignment="CENTER" prefHeight="64.0" prefWidth="600.0" spacing="4.0">
                <children>
-                  <TextField fx:id="inputTxt" alignment="BOTTOM_LEFT" onAction="#sendMessage" prefHeight="42.0" prefWidth="409.0" HBox.hgrow="ALWAYS" />
+                  <TextArea fx:id="inputTxt" maxHeight="-Infinity" prefHeight="42.0" prefWidth="409.0" wrapText="true" HBox.hgrow="ALWAYS" />
                   <Button fx:id="btnSendMessage" mnemonicParsing="false" onAction="#sendMessage" prefHeight="42.0" text="">
                      <graphic>
                         <FontIcon iconLiteral="mdmz-send" />
