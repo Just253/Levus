@@ -70,23 +70,17 @@ def processGesture(name, history, hand, last_time):
     name = name.lower()
     hand = hand.lower()
 
-    if hand == 'left' and name == 'close':
+    if hand == 'left':
         should_execute, new_time = timer(last_time)
         if should_execute:
-            print("Hidding all windows")
-            hide_all_windows().execute()
-            last_time = new_time
-
-    if history is None:
-        return last_time
-
-    history = history.lower()
-    if hand == 'right' and name == 'open':
-        should_execute, new_time = timer(last_time)
-        if should_execute:
-            print("Showing all windows")
-            show_minimized_windows().execute()
-            last_time = new_time
+            if name == 'close':
+                print("Hidding all windows")
+                hide_all_windows().execute()
+                last_time = new_time
+            elif name == 'open':
+                print("Showing all windows")
+                show_minimized_windows().execute()
+                last_time = new_time
 
     adjust_movement_speed(name, 2)
     if name == 'mouse_up':
