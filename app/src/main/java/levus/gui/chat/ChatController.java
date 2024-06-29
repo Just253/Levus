@@ -49,7 +49,7 @@ public class ChatController {
     private ScrollPane chatBox;
 
     @FXML
-    private TextField inputTxt;
+    private TextArea inputTxt;
 
     @FXML
     private Button btnSendMessage;

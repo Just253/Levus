@@ -2,6 +2,7 @@ package levus.gui.chat;
 
 import javafx.application.Platform;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import org.json.JSONObject;
@@ -22,7 +23,7 @@ import javax.sound.sampled.*;
 import javafx.concurrent.Task;
 
 public class VoskController {
-    private TextField textField;
+    private TextArea textField;
     private Button button;
     private ToggleButton toggleButton;
     private final String modelName  = "vosk-model-small-es-0.42";
@@ -126,7 +127,7 @@ public class VoskController {
         });
     }
 
-    public void setTextField(TextField textField) {
+    public void setTextField(TextArea textField) {
         this.textField = textField;
     }
 
