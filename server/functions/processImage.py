@@ -40,7 +40,7 @@ movement_speed = 5  # Velocidad inicial de movimiento
 def adjust_movement_speed(name):
     global last_gesture, movement_speed
     if name == last_gesture:
-        movement_speed = min(movement_speed + 5, max_movement)
+        movement_speed = min(movement_speed + 2, max_movement)
     else:
         movement_speed = 5
     last_gesture = name
