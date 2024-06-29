@@ -70,7 +70,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     import traceback
     try:
         system_message = list(filter(lambda x: x['role'] == 'system', messages))
-        system_message_content = f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {",".join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | No ejecutes si no te lo piden"
+        system_message_content = f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {','.join(all_tools)}  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | No ejecutes si no te lo piden"
         if system_message:
             system_message = system_message[0]
             system_message_content = system_message["content"][0]["text"] + system_message_content
