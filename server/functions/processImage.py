@@ -31,6 +31,21 @@ mouse_event = ctypes.windll.user32.mouse_event
 class POINT(ctypes.Structure):
     _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
 
+# Antes de la definición de la función processGesture, agregar:
+screen_width, screen_height = pyautogui.size()
+max_movement = min(screen_width, screen_height) // 10  # Límite máximo de movimiento
+last_gesture = None  # Almacena el último gesto de movimiento
+movement_speed = 5  # Velocidad inicial de movimiento
+
+def adjust_movement_speed(name):
+    global last_gesture, movement_speed
+    if name == last_gesture:
+        movement_speed = min(movement_speed + 5, max_movement)
+    else:
+        movement_speed = 5
+    last_gesture = name
+
+
 # Obtener la posición actual del cursor
 def get_cursor_pos():
     point = POINT()
@@ -70,14 +85,15 @@ def processGesture(name, history, hand, last_time):
             show_minimized_windows().execute()
             last_time = new_time
 
+    adjust_movement_speed(name)
     if name == 'mouse_up':
-        move_mouse(0, -5)
+        move_mouse(0, -movement_speed)
     elif name == 'mouse_down':
-        move_mouse(0, 5)
+        move_mouse(0, movement_speed)
     elif name == 'mouse_right':
-        move_mouse(-5, 0)
+        move_mouse(-movement_speed, 0)
     elif name == 'mouse_left':
-        move_mouse(5, 0)
+        move_mouse(movement_speed, 0)
 
     if name == 'ok':
         should_execute, new_time = timer(last_time)
