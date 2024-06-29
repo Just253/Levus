@@ -193,18 +193,16 @@ class HandGestureRecognition:
         self.running = False
         self.cap.release()
 
-def select_mode(key, mode,number):
-    block_numbers = [110, 107, 104]
-    if 97 <= key <= 122 and key not in block_numbers: # a-z but not n,k,h
+def select_mode(key, mode, number):
+    if 97 <= key <= 122:  # a-z
         number = key - 97
-    if key == 110:  # n
+    if key == 57:  # 9
         mode = 0
-    if key == 107:  # k
+    if key == 49:  # 1
         mode = 1
-    if key == 104:  # h
+    if key == 50:  # 2
         mode = 2
     return number, mode
-
 
 def calc_bounding_rect(image, landmarks):
     image_width, image_height = image.shape[1], image.shape[0]
