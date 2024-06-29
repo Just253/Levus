@@ -391,19 +391,18 @@ def draw_point_history(image, point_history):
     return image
 
 
-def draw_info(image, fps, mode, number):
-    cv.putText(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
-               1.0, (0, 0, 0), 4, cv.LINE_AA)
-    cv.putText(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
-               1.0, (255, 255, 255), 2, cv.LINE_AA)
+def draw_text_with_outline(image, text, position, font, font_scale, font_thickness, text_color, outline_color, outline_thickness):
+  # Dibuja el texto con contorno
+  cv.putText(image, text, position, font, font_scale, outline_color, font_thickness + outline_thickness, cv.LINE_AA)
+  cv.putText(image, text, position, font, font_scale, text_color, font_thickness, cv.LINE_AA)
 
-    mode_string = ['Logging Key Point', 'Logging Point History']
-    if 1 <= mode <= 2:
-        cv.putText(image, "MODE:" + mode_string[mode - 1], (10, 90),
-                   cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
-                   cv.LINE_AA)
-        if 0 <= number <= 9:
-            cv.putText(image, "NUM:" + str(number), (10, 110),
-                       cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
-                       cv.LINE_AA)
-    return image
+def draw_info(image, fps, mode, number):
+  # Simplifica el dibujo de información en la imagen
+  draw_text_with_outline(image, "FPS:" + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, 2, (255, 255, 255), (0, 0, 0), 2)
+
+  mode_string = ['Logging Key Point', 'Logging Point History']
+  if 1 <= mode <= 2:
+    draw_text_with_outline(image, "MODE:" + mode_string[mode - 1], (10, 90), cv.FONT_HERSHEY_SIMPLEX, 0.6, 1, (255, 255, 255), (0, 0, 0), 2)
+    if 0 <= number <= 9:
+      draw_text_with_outline(image, "NUM:" + str(number), (10, 110), cv.FONT_HERSHEY_SIMPLEX, 0.6, 1, (255, 255, 255), (0, 0, 0), 2)
+  return image
