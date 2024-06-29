@@ -403,6 +403,6 @@ def draw_info(image, fps, mode, number):
   mode_string = ['Logging Key Point', 'Logging Point History']
   if 1 <= mode <= 2:
     draw_text_with_outline(image, "MODE:" + mode_string[mode - 1], (10, 90), cv.FONT_HERSHEY_SIMPLEX, 0.6, 1, (255, 255, 255), (0, 0, 0), 2)
-    if 0 <= number <= 9:
+    if 0 <= number:
       draw_text_with_outline(image, "NUM:" + str(number), (10, 110), cv.FONT_HERSHEY_SIMPLEX, 0.6, 1, (255, 255, 255), (0, 0, 0), 2)
   return image
