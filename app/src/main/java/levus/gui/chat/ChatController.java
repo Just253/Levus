@@ -9,9 +9,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import io.socket.client.Socket;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import levus.gui.connections.Socket_manager;
@@ -90,36 +94,47 @@ public class ChatController {
             e.printStackTrace();
         }
     }
-    public Label makeLabel(String text, String role) {
+    public Text makeLabel(String text, String role) {
         return makeLabel(text, role, "");
     }
-    public Label makeLabel(String text, String role, String ProcessId) {
-        Label label = new Label();
-        label.setMaxWidth(chatHistory.getWidth() * 0.9);
-        label.setMaxHeight(Double.MAX_VALUE);
-        label.setWrapText(true);
-        label.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
-        label.setText(text);
-        label.setId(ProcessId);
+    public Text makeLabel(String text, String role, String ProcessId) {
+        // Crea un nuevo TextFlow para el texto del mensaje
+        Text textNode = new Text(text);
+        textNode.setId(ProcessId);
+        textNode.getStyleClass().add("messages-text");
+
+        textNode.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Si el scroll estaba en la parte inferior antes de que el texto cambiara
+            if (chatBox.getVvalue() == 1.0) {
+                // Después de que el texto cambie, mueve el scroll a la parte inferior
+                Platform.runLater(() -> chatBox.setVvalue(1.0));
+            }
+        });
+
+        TextFlow textFlow = new TextFlow(textNode);
+        textFlow.setMaxWidth(chatHistory.getWidth() * 0.9);
+        textFlow.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        textFlow.getStyleClass().add("messages");
 
         chatHistory.widthProperty().addListener((observable, oldValue, newValue) -> {
-            label.setMaxWidth(newValue.doubleValue() * 0.9);
+            textFlow.setMaxWidth(newValue.doubleValue() * 0.9);
         });
 
         HBox hBox = new HBox();
         hBox.setMinWidth(100);
         hBox.setMaxWidth(Double.MAX_VALUE);
 
-        hBox.getChildren().add(label);
+        hBox.getChildren().add(textFlow);
         if (role.equals("user")) {
-            label.getStyleClass().add("messages-user");
+            textFlow.getStyleClass().add("messages-user");
             hBox.setAlignment(Pos.CENTER_RIGHT);
         } else {
-            label.getStyleClass().add("messages-assistant");
+            textFlow.getStyleClass().add("messages-assistant");
             hBox.setAlignment(Pos.CENTER_LEFT);
         }
         chatHistory.getChildren().add(hBox);
-        return label;
+
+        return textNode;
     }
 
     public void addMessage(JSONObject message) {
@@ -131,9 +146,6 @@ public class ChatController {
                 String text = item.getString("text");
                 makeLabel(text, role);
             }
-            Platform.runLater(() -> {
-                chatBox.setVvalue(1.0);
-            }); 
         }
     
     }
@@ -164,9 +176,9 @@ public class ChatController {
         messages.put(message);
         inputTxt.clear();
 
-        addMessage(message);
         Platform.runLater(() -> {
-            chatBox.setVvalue(1.0);
+            addMessage(message);
+            //chatBox.setVvalue(2.0);
         });
 
         String model = "gpt-3.5-turbo-0125";
@@ -174,44 +186,6 @@ public class ChatController {
         data.put("model", model);
         data.put("messages", messages);
         this.socket.emit("new_message", data);
-    }
-
-    public void askAssistant() {
-        Task<JSONObject> task = new Task<>() {
-            @Override
-            protected JSONObject call() throws Exception {
-                ApiController api = new ApiController();
-                JSONObject response = api.sendMessage(messages);
-                String processId = api.getProcessId(response);
-                AtomicReference<Label> label = new AtomicReference<>();
-                Platform.runLater(() -> {
-                    label.set(makeLabel("...", "assistant"));
-                    chatBox.setVvalue(1.0);
-                }); 
-                while (true) {
-                    JSONObject status = api.getStatus(processId);
-                    if (status.getString("status").equals("completed")) {
-                        break;
-                    }
-                    final String preview = status.getString("preview");
-                    Platform.runLater(() -> {
-                        label.get().setText(preview);
-                    }); 
-                    Thread.sleep(150);
-                }
-                JSONObject finalResponse = api.getStatus(processId);
-                Platform.runLater(() -> {
-                    label.get().setText(finalResponse.getString("response"));
-                });
-                return response;
-            }
-        };
-        task.setOnSucceeded(EventHandler -> {
-            Platform.runLater(() -> {
-                chatBox.setVvalue(1.0);
-            });  
-        });
-        new Thread(task).start();
     }
 
     public void setPrimaryStage(Stage primaryStage) {
@@ -247,9 +221,11 @@ public class ChatController {
         });
 
         // si chat box es actualizado con un nuevo item y el scroll esta en la parte inferior, entonces el scroll se mueve a la parte inferior
-        chatBox.vvalueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.doubleValue() == 1.0) {
-                chatBox.setVvalue(1.0);
+        chatHistory.getChildren().addListener((ListChangeListener<Node>) c -> {
+            // Si el scroll está en la parte inferior antes de añadir el nuevo mensaje
+            if (chatBox.getVvalue() == 1.0) {
+                // Después de añadir el nuevo mensaje, mueve el scroll a la parte inferior
+                Platform.runLater(() -> chatBox.setVvalue(1.0));
             }
         });
         
