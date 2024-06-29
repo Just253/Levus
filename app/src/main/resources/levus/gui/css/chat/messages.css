@@ -1,7 +1,10 @@
-.label{
-  -fx-text-fill: -main-bg-1;
+.messages{
   -fx-background-radius: 10px;
   -fx-padding: 10px;
+}
+
+.messages-text{
+    -fx-fill: -main-bg-1;
 }
 
 .messages-assistant{
