@@ -43,7 +43,7 @@ def get_response_from_openai(messages, process_id, table: statusTable =None, too
     all_tools = commands.getToolsNames()
     print("All tools: ", all_tools)
     system_message = list(filter(lambda x: x['role'] == 'system', messages))[0]
-    system_message["content"][0]["text"] += f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {",".join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | "
+    system_message["content"][0]["text"] += f" Llama a herramienta {default_tool_name} para poder tener informacion y usar estos tools {','.join(all_tools) }  | Si no hay un tool que satisfaga no busques, solo responde segun conozcas | "
     print(system_message)
     non_system_messages = list(filter(lambda x: x['role'] != 'system', messages))
     last_10_non_system_messages = non_system_messages[-5:]
