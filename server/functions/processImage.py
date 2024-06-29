@@ -37,14 +37,17 @@ max_movement = min(screen_width, screen_height) // 10  # Límite máximo de movi
 last_gesture = None  # Almacena el último gesto de movimiento
 movement_speed = 5  # Velocidad inicial de movimiento
 
-def adjust_movement_speed(name):
-    global last_gesture, movement_speed
+def adjust_movement_speed(name, repetition_threshold=2):
+    global last_gesture, movement_speed, gesture_counter
     if name == last_gesture:
-        movement_speed = min(movement_speed + 2, max_movement)
+        gesture_counter += 1
+        if gesture_counter >= repetition_threshold:
+            movement_speed = min(movement_speed + 1, max_movement)
+            gesture_counter = 0  # Restablecer el contador después de aumentar la velocidad
     else:
         movement_speed = 5
+        gesture_counter = 0  # Restablecer el contador si el gesto cambia
     last_gesture = name
-
 
 # Obtener la posición actual del cursor
 def get_cursor_pos():
@@ -85,7 +88,7 @@ def processGesture(name, history, hand, last_time):
             show_minimized_windows().execute()
             last_time = new_time
 
-    adjust_movement_speed(name)
+    adjust_movement_speed(name, 2)
     if name == 'mouse_up':
         move_mouse(0, -movement_speed)
     elif name == 'mouse_down':
