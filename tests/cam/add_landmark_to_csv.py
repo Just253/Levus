@@ -18,5 +18,6 @@ for image,_,_ in images:
 # esc/q = salir
 
 # Elegir un numero del 1-9 (en este caso 1-3 ya estan ocupados) para grabar con ese ID y presionar ese numero
+# Ahora en vez de numeros usar teclas de letras para grabar con ese ID, a-z cada uno representa un ID, a -> 1, b -> 2, ... z -> 26
 
 # !!! el cv2 no logra detectar las teclas asi que repite la tecla varias veces (recuerda tener seleccionado la ventana de la camara)
