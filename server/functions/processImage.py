@@ -95,6 +95,10 @@ def processGesture(name, history, hand, last_time):
         move_mouse(movement_speed, -movement_speed)  # Mover hacia arriba y hacia la derecha
     elif name == 'mouse_diagonal_right_down':
         move_mouse(movement_speed, movement_speed)
+    elif name == 'mouse_diagonal_left_up':
+        move_mouse(-movement_speed, -movement_speed)
+    elif name == 'mouse_diagonal_left_down':
+        move_mouse(-movement_speed, movement_speed)
 
     if name == 'ok':
         should_execute, new_time = timer(last_time)
